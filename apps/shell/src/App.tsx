@@ -1,12 +1,21 @@
-import { BrowserRouter, Link, Route, Routes } from "react-router";
-import { CryptoPage } from "./pages/CryptoPage";
-import { DashboardPage } from "./pages/DashboardPage";
-import { EconomyPage } from "./pages/EconomyPage";
-import { WatchlistPage } from "./pages/WatchlistPage";
 import { lazy, Suspense } from "react";
+import { BrowserRouter, Link, Route, Routes } from "react-router";
+import { DashboardPage } from "./pages/DashboardPage";
 
 const MarketsApp = lazy(() =>
   import("markets/App").then((module) => ({ default: module.App })),
+);
+
+const CryptoApp = lazy(() =>
+  import("crypto/App").then((module) => ({ default: module.App })),
+);
+
+const EconomyApp = lazy(() =>
+  import("economy/App").then((module) => ({ default: module.App })),
+);
+
+const WatchlistApp = lazy(() =>
+  import("watchlist/App").then((module) => ({ default: module.App })),
 );
 
 export function App() {
@@ -32,9 +41,30 @@ export function App() {
             </Suspense>
           }
         />
-        <Route path="/crypto" element={<CryptoPage />} />
-        <Route path="/economy" element={<EconomyPage />} />
-        <Route path="/watchlist" element={<WatchlistPage />} />
+        <Route
+          path="/crypto"
+          element={
+            <Suspense fallback={<p>Loading crypto...</p>}>
+              <CryptoApp />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/economy"
+          element={
+            <Suspense fallback={<p>Loading economy...</p>}>
+              <EconomyApp />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/watchlist"
+          element={
+            <Suspense fallback={<p>Loading watchlist...</p>}>
+              <WatchlistApp />
+            </Suspense>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

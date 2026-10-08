@@ -30,14 +30,19 @@ module.exports = {
       name: "shell",
       remotes: {
         markets: "markets@http://localhost:3001/remoteEntry.js",
+        crypto: "cryptoApp@http://localhost:3002/remoteEntry.js",
+        economy: "economy@http://localhost:3003/remoteEntry.js",
+        watchlist: "watchlist@http://localhost:3004/remoteEntry.js",
       },
       shared: {
         react: {
           singleton: true,
+          eager: true,
           requiredVersion: "^19.3.0",
         },
         "react-dom": {
           singleton: true,
+          eager: true,
           requiredVersion: "^19.3.0",
         },
       },

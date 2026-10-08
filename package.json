@@ -1,0 +1,11 @@
+{
+  "name": "marketscope",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "concurrently -n shell,markets,crypto,economy,watchlist -c auto \"npm start --prefix apps/shell\" \"npm start --prefix apps/markets\" \"npm start --prefix apps/crypto\" \"npm start --prefix apps/economy\" \"npm start --prefix apps/watchlist\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
