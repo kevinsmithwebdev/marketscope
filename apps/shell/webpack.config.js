@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { ModuleFederationPlugin } = require("webpack").container;
 
 module.exports = {
   mode: "development",
@@ -24,6 +25,22 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "index.html"),
+    }),
+    new ModuleFederationPlugin({
+      name: "shell",
+      remotes: {
+        markets: "markets@http://localhost:3001/remoteEntry.js",
+      },
+      shared: {
+        react: {
+          singleton: true,
+          requiredVersion: "^19.3.0",
+        },
+        "react-dom": {
+          singleton: true,
+          requiredVersion: "^19.3.0",
+        },
+      },
     }),
   ],
   devServer: {

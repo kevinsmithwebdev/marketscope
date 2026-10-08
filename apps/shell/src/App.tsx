@@ -2,8 +2,12 @@ import { BrowserRouter, Link, Route, Routes } from "react-router";
 import { CryptoPage } from "./pages/CryptoPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { EconomyPage } from "./pages/EconomyPage";
-import { MarketsPage } from "./pages/MarketsPage";
 import { WatchlistPage } from "./pages/WatchlistPage";
+import { lazy, Suspense } from "react";
+
+const MarketsApp = lazy(() =>
+  import("markets/App").then((module) => ({ default: module.App })),
+);
 
 export function App() {
   return (
@@ -20,7 +24,14 @@ export function App() {
       </header>
       <Routes>
         <Route path="/" element={<DashboardPage />} />
-        <Route path="/markets" element={<MarketsPage />} />
+        <Route
+          path="/markets"
+          element={
+            <Suspense fallback={<p>Loading markets...</p>}>
+              <MarketsApp />
+            </Suspense>
+          }
+        />
         <Route path="/crypto" element={<CryptoPage />} />
         <Route path="/economy" element={<EconomyPage />} />
         <Route path="/watchlist" element={<WatchlistPage />} />
