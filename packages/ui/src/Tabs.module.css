@@ -1,0 +1,28 @@
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tab,
+.selected {
+  background: var(--ms-surface, #ffffff);
+  border: 1px solid var(--ms-border, #e1e7f0);
+  border-radius: 999px;
+  color: var(--ms-text, #172033);
+  cursor: pointer;
+  font: inherit;
+  padding: 6px 12px;
+}
+
+.tab:focus-visible,
+.selected:focus-visible {
+  outline: 2px solid var(--ms-accent, #1d4ed8);
+  outline-offset: 2px;
+}
+
+.selected {
+  background: var(--ms-accent, #1d4ed8);
+  border-color: var(--ms-accent, #1d4ed8);
+  color: var(--ms-accent-contrast, #ffffff);
+}

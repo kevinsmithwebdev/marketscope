@@ -1,0 +1,26 @@
+.dialog {
+  background: var(--ms-surface, #ffffff);
+  border: 1px solid var(--ms-border, #e1e7f0);
+  border-radius: 12px;
+  color: var(--ms-text, #172033);
+  max-width: 480px;
+  padding: 16px;
+  width: calc(100% - 32px);
+}
+
+.dialog::backdrop {
+  background: rgb(23 32 51 / 40%);
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 1.1rem;
+  margin: 0;
+}
