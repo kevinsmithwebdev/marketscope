@@ -1,4 +1,5 @@
 import { Controller, Get, Param, Res } from "@nestjs/common";
+import { MARKET_CATALOG } from "./catalog";
 import { MarketHistoryService } from "./market-history.service";
 
 type CacheResponse = {
@@ -8,6 +9,11 @@ type CacheResponse = {
 @Controller("markets")
 export class MarketsController {
   constructor(private readonly history: MarketHistoryService) {}
+
+  @Get("catalog")
+  getCatalog() {
+    return { instruments: MARKET_CATALOG };
+  }
 
   @Get("stocks/:symbol/history")
   async getHistory(
