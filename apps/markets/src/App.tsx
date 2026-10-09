@@ -1,8 +1,9 @@
 import type { InstrumentGroup } from "@marketscope/types";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { ErrorState, Select, Skeleton, Tabs } from "@marketscope/ui";
+import { Card, ErrorState, Select, Skeleton, Tabs } from "@marketscope/ui";
 import { useState } from "react";
 import { fetchCatalog, HISTORY_STALE_TIME_MS } from "./api";
+import { QuoteSummary } from "./QuoteSummary";
 import { StockHistoryChart } from "./StockHistoryChart";
 import styles from "./App.module.css";
 
@@ -48,6 +49,7 @@ function MarketsPage() {
     return <ErrorState message={message} title="Markets are unavailable" titleAs="h1" />;
   }
 
+  const indices = catalog.data.instruments.filter((instrument) => instrument.group === "index");
   const instruments = catalog.data.instruments.filter((instrument) => instrument.group === group);
   const selected = instruments.some((instrument) => instrument.symbol === symbol)
     ? symbol
@@ -60,6 +62,29 @@ function MarketsPage() {
         Index rows use traded trackers, such as SPY for the S&P 500, because the free market feed
         prices funds rather than the index itself.
       </p>
+      <div className={styles.indices}>
+        {indices.map((index) => {
+          const pressed = index.symbol === selected && group === "index";
+          return (
+            <button
+              aria-pressed={pressed}
+              className={pressed ? styles.indexSelected : styles.index}
+              key={index.symbol}
+              onClick={() => {
+                setGroup("index");
+                setSymbol(index.symbol);
+              }}
+              type="button"
+            >
+              <strong>{index.symbol}</strong>
+              <span>{index.name}</span>
+            </button>
+          );
+        })}
+      </div>
+      <Card title="Latest quote">
+        <QuoteSummary symbol={selected} />
+      </Card>
       <Tabs
         label="Instrument groups"
         onChange={(id) => {

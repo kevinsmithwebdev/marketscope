@@ -7,3 +7,33 @@
   color: var(--ms-muted, #5c6b82);
   margin: 0;
 }
+
+.indices {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.index,
+.indexSelected {
+  background: var(--ms-surface, #ffffff);
+  border: 1px solid var(--ms-border, #e1e7f0);
+  border-radius: 12px;
+  color: var(--ms-text, #172033);
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  gap: 4px;
+  padding: 12px;
+  text-align: left;
+}
+
+.indexSelected {
+  border-color: var(--ms-accent, #1d4ed8);
+}
+
+.index:focus-visible,
+.indexSelected:focus-visible {
+  outline: 2px solid var(--ms-accent, #1d4ed8);
+  outline-offset: 2px;
+}
