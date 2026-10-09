@@ -9,6 +9,7 @@ import {
   YAxis,
 } from "recharts";
 import { fetchStockHistory, HISTORY_STALE_TIME_MS } from "./api";
+import styles from "./StockHistoryChart.module.css";
 
 export function StockHistoryChart({ symbol }: { symbol: string }) {
   const history = useQuery({
@@ -32,9 +33,9 @@ export function StockHistoryChart({ symbol }: { symbol: string }) {
   }
 
   return (
-    <section style={{ color: "#172033", background: "#ffffff", padding: 16 }}>
-      <h1 style={{ marginTop: 0 }}>{history.data.symbol} daily close</h1>
-      <div style={{ width: "100%", height: 360 }}>
+    <section className={styles.section}>
+      <h1 className={styles.title}>{history.data.symbol} daily close</h1>
+      <div className={styles.chart}>
         <ResponsiveContainer>
           <LineChart data={history.data.points}>
             <CartesianGrid stroke="#e6eaf0" />

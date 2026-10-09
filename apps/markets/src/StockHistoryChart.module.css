@@ -1,0 +1,14 @@
+.section {
+  color: #172033;
+  background: #ffffff;
+  padding: 16px;
+}
+
+.title {
+  margin-top: 0;
+}
+
+.chart {
+  width: 100%;
+  height: 360px;
+}
