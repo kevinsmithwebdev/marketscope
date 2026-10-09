@@ -1,22 +1,36 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from "react";
 import { BrowserRouter, Link, Route, Routes } from "react-router";
 import { DashboardPage } from "./pages/DashboardPage";
+import { RemoteErrorBoundary } from "./RemoteErrorBoundary";
 
-const MarketsApp = lazy(() =>
-  import("markets/App").then((module) => ({ default: module.App })),
-);
+type RemoteModule = {
+  App: ComponentType;
+};
 
-const CryptoApp = lazy(() =>
-  import("crypto/App").then((module) => ({ default: module.App })),
-);
+function loadRemote(importer: () => Promise<RemoteModule>) {
+  return () => importer().then((module) => ({ default: module.App }));
+}
 
-const EconomyApp = lazy(() =>
-  import("economy/App").then((module) => ({ default: module.App })),
-);
+const MarketsApp = lazy(loadRemote(() => import("markets/App")));
+const CryptoApp = lazy(loadRemote(() => import("crypto/App")));
+const EconomyApp = lazy(loadRemote(() => import("economy/App")));
+const WatchlistApp = lazy(loadRemote(() => import("watchlist/App")));
 
-const WatchlistApp = lazy(() =>
-  import("watchlist/App").then((module) => ({ default: module.App })),
-);
+function RemoteRoute({
+  name,
+  remote: Remote,
+}: {
+  name: string;
+  remote: LazyExoticComponent<ComponentType>;
+}) {
+  return (
+    <RemoteErrorBoundary name={name}>
+      <Suspense fallback={<p>Loading {name.toLowerCase()}...</p>}>
+        <Remote />
+      </Suspense>
+    </RemoteErrorBoundary>
+  );
+}
 
 export function App() {
   return (
@@ -35,35 +49,19 @@ export function App() {
         <Route path="/" element={<DashboardPage />} />
         <Route
           path="/markets"
-          element={
-            <Suspense fallback={<p>Loading markets...</p>}>
-              <MarketsApp />
-            </Suspense>
-          }
+          element={<RemoteRoute name="Markets" remote={MarketsApp} />}
         />
         <Route
           path="/crypto"
-          element={
-            <Suspense fallback={<p>Loading crypto...</p>}>
-              <CryptoApp />
-            </Suspense>
-          }
+          element={<RemoteRoute name="Crypto" remote={CryptoApp} />}
         />
         <Route
           path="/economy"
-          element={
-            <Suspense fallback={<p>Loading economy...</p>}>
-              <EconomyApp />
-            </Suspense>
-          }
+          element={<RemoteRoute name="Economy" remote={EconomyApp} />}
         />
         <Route
           path="/watchlist"
-          element={
-            <Suspense fallback={<p>Loading watchlist...</p>}>
-              <WatchlistApp />
-            </Suspense>
-          }
+          element={<RemoteRoute name="Watchlist" remote={WatchlistApp} />}
         />
       </Routes>
     </BrowserRouter>
