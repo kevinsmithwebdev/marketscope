@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Res } from "@nestjs/common";
 import { findInstrument, MARKET_CATALOG } from "./catalog";
 import { MarketHistoryService } from "./market-history.service";
+import { MarketMoversService } from "./market-movers.service";
 import { MarketQuoteService } from "./market-quote.service";
 
 type CacheResponse = {
@@ -12,11 +13,19 @@ export class MarketsController {
   constructor(
     private readonly history: MarketHistoryService,
     private readonly quotes: MarketQuoteService,
+    private readonly movers: MarketMoversService,
   ) {}
 
   @Get("catalog")
   getCatalog() {
     return { instruments: MARKET_CATALOG };
+  }
+
+  @Get("movers")
+  async getMovers(@Res({ passthrough: true }) response: CacheResponse) {
+    const result = await this.movers.getMovers();
+    response.setHeader("X-Cache", result.cacheStatus);
+    return result.data;
   }
 
   @Get("stocks/:symbol/quote")

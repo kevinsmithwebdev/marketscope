@@ -5,6 +5,7 @@ import { useState } from "react";
 import { fetchCatalog, HISTORY_STALE_TIME_MS } from "./api";
 import { QuoteSummary } from "./QuoteSummary";
 import { StockHistoryChart } from "./StockHistoryChart";
+import { TopMovers } from "./TopMovers";
 import styles from "./App.module.css";
 
 const queryClient = new QueryClient({
@@ -108,6 +109,7 @@ function MarketsPage() {
         value={selected}
       />
       <StockHistoryChart symbol={selected} />
+      <TopMovers />
     </section>
   );
 }

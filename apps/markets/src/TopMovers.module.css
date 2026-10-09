@@ -1,0 +1,19 @@
+.movers {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 800px) {
+  .movers {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .updated {
+    grid-column: 1 / -1;
+  }
+}
+
+.updated {
+  color: var(--ms-muted, #5c6b82);
+  margin: 0;
+}

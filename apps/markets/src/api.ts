@@ -1,4 +1,4 @@
-import type { InstrumentCatalog, InstrumentQuote, StockHistory } from "@marketscope/types";
+import type { InstrumentCatalog, InstrumentQuote, MarketMovers, StockHistory } from "@marketscope/types";
 
 export const API_BASE_URL = "http://localhost:4000";
 
@@ -6,6 +6,14 @@ export const HISTORY_STALE_TIME_MS = 15 * 60 * 1000;
 
 export async function fetchCatalog(): Promise<InstrumentCatalog> {
   return readJson<InstrumentCatalog>(`${API_BASE_URL}/api/markets/catalog`);
+}
+
+export async function fetchMovers(): Promise<MarketMovers> {
+  const movers = await readJson<MarketMovers>(`${API_BASE_URL}/api/markets/movers`);
+  if (movers.source !== "alpha-vantage" || !Array.isArray(movers.gainers) || !Array.isArray(movers.losers)) {
+    throw new Error("Market data is unavailable");
+  }
+  return movers;
 }
 
 export async function fetchQuote(symbol: string): Promise<InstrumentQuote> {
