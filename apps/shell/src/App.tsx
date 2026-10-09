@@ -1,7 +1,10 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from "react";
-import { BrowserRouter, Link, Route, Routes } from "react-router";
+import { BrowserRouter, NavLink, Route, Routes } from "react-router";
+import { DemoUserProvider, useDemoUser } from "./demo-user";
+import { Notifications } from "./Notifications";
 import { DashboardPage } from "./pages/DashboardPage";
 import { RemoteErrorBoundary } from "./RemoteErrorBoundary";
+import styles from "./App.module.css";
 
 type RemoteModule = {
   App: ComponentType;
@@ -32,38 +35,60 @@ function RemoteRoute({
   );
 }
 
+function navClass({ isActive }: { isActive: boolean }) {
+  return isActive ? styles.active : styles.link;
+}
+
+function ShellFrame() {
+  const user = useDemoUser();
+
+  return (
+    <div className={styles.shell}>
+      <header className={styles.header}>
+        <strong className={styles.brand}>MarketScope</strong>
+        <nav aria-label="Primary" className={styles.nav}>
+          <NavLink className={navClass} to="/">
+            Dashboard
+          </NavLink>
+          <NavLink className={navClass} to="/markets">
+            Markets
+          </NavLink>
+          <NavLink className={navClass} to="/crypto">
+            Crypto
+          </NavLink>
+          <NavLink className={navClass} to="/economy">
+            Economy
+          </NavLink>
+          <NavLink className={navClass} to="/watchlist">
+            Watchlist
+          </NavLink>
+        </nav>
+        <span className={styles.user}>{user.name}</span>
+      </header>
+      <Notifications>
+        <main className={styles.main}>
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/markets" element={<RemoteRoute name="Markets" remote={MarketsApp} />} />
+            <Route path="/crypto" element={<RemoteRoute name="Crypto" remote={CryptoApp} />} />
+            <Route path="/economy" element={<RemoteRoute name="Economy" remote={EconomyApp} />} />
+            <Route
+              path="/watchlist"
+              element={<RemoteRoute name="Watchlist" remote={WatchlistApp} />}
+            />
+          </Routes>
+        </main>
+      </Notifications>
+    </div>
+  );
+}
+
 export function App() {
   return (
-    <BrowserRouter>
-      <header>
-        <strong>MarketScope</strong>
-        <nav>
-          <Link to="/">Dashboard</Link>
-          <Link to="/markets">Markets</Link>
-          <Link to="/crypto">Crypto</Link>
-          <Link to="/economy">Economy</Link>
-          <Link to="/watchlist">Watchlist</Link>
-        </nav>
-      </header>
-      <Routes>
-        <Route path="/" element={<DashboardPage />} />
-        <Route
-          path="/markets"
-          element={<RemoteRoute name="Markets" remote={MarketsApp} />}
-        />
-        <Route
-          path="/crypto"
-          element={<RemoteRoute name="Crypto" remote={CryptoApp} />}
-        />
-        <Route
-          path="/economy"
-          element={<RemoteRoute name="Economy" remote={EconomyApp} />}
-        />
-        <Route
-          path="/watchlist"
-          element={<RemoteRoute name="Watchlist" remote={WatchlistApp} />}
-        />
-      </Routes>
-    </BrowserRouter>
+    <DemoUserProvider>
+      <BrowserRouter>
+        <ShellFrame />
+      </BrowserRouter>
+    </DemoUserProvider>
   );
 }

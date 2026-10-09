@@ -1,0 +1,20 @@
+:root {
+  --ms-bg: #f4f7fb;
+  --ms-surface: #ffffff;
+  --ms-text: #172033;
+  --ms-muted: #5c6b82;
+  --ms-border: #e1e7f0;
+  --ms-accent: #1d4ed8;
+  --ms-accent-contrast: #ffffff;
+  color: var(--ms-text);
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  background: var(--ms-bg);
+  margin: 0;
+}
+
+a {
+  color: var(--ms-accent);
+}

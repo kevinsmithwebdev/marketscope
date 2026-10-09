@@ -1,0 +1,13 @@
+.region {
+  display: grid;
+  gap: 8px;
+  margin: 16px 24px 0;
+}
+
+.notice {
+  background: var(--ms-surface);
+  border: 1px solid var(--ms-border);
+  border-radius: 8px;
+  margin: 0;
+  padding: 10px 12px;
+}

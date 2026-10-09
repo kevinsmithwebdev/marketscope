@@ -1,0 +1,10 @@
+.intro {
+  color: var(--ms-muted);
+  max-width: 62ch;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}

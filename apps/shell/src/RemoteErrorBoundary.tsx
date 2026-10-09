@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Button, ErrorState } from "@marketscope/ui";
 
 type RemoteErrorBoundaryProps = {
   name: string;
@@ -26,19 +27,22 @@ export class RemoteErrorBoundary extends Component<
   render() {
     if (this.state.error) {
       return (
-        <section role="alert">
-          <h1>{this.props.name} failed to load</h1>
-          <p>The shell is still running. This remote did not finish loading.</p>
-          <button
-            type="button"
-            onClick={() => {
-              // The host keeps a rejected container promise until the page loads again.
-              window.location.reload();
-            }}
-          >
-            Retry
-          </button>
-        </section>
+        <ErrorState
+          action={
+            <Button
+              onClick={() => {
+                // The host keeps a rejected container promise until the page loads again.
+                window.location.reload();
+              }}
+              variant="secondary"
+            >
+              Retry
+            </Button>
+          }
+          message="The shell is still running. This remote did not finish loading."
+          title={`${this.props.name} failed to load`}
+          titleAs="h1"
+        />
       );
     }
 

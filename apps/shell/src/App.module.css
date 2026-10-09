@@ -1,0 +1,54 @@
+.shell {
+  min-height: 100vh;
+}
+
+.header {
+  align-items: center;
+  background: var(--ms-surface);
+  border-bottom: 1px solid var(--ms-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding: 16px 24px;
+}
+
+.brand {
+  font-size: 1.1rem;
+}
+
+.nav {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.link,
+.active {
+  color: var(--ms-text);
+  text-decoration: none;
+}
+
+.active {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.user {
+  color: var(--ms-muted);
+}
+
+.main {
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 24px;
+}
+
+@media (max-width: 640px) {
+  .header,
+  .main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
