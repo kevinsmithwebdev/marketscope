@@ -5,6 +5,7 @@ import {
   ServiceUnavailableException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import type { InstrumentGroup } from "./catalog";
 import {
   InvalidSymbolError,
   MarketHistoryClient,
@@ -21,9 +22,9 @@ export class MarketHistoryService {
     });
   }
 
-  async getDailyHistory(symbol: string) {
+  async getDailyHistory(symbol: string, group?: InstrumentGroup) {
     try {
-      return await this.client.getDailyHistory(symbol);
+      return await this.client.getDailyHistory(symbol, group);
     } catch (error) {
       if (error instanceof InvalidSymbolError) {
         throw new BadRequestException("Symbol is not valid");

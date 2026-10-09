@@ -1,6 +1,8 @@
 .section {
-  color: #172033;
-  background: #ffffff;
+  background: var(--ms-surface, #ffffff);
+  border: 1px solid var(--ms-border, #e1e7f0);
+  border-radius: 12px;
+  color: var(--ms-text, #172033);
   padding: 16px;
 }
 

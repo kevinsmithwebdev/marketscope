@@ -15,7 +15,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-export function normalizeDailySeries(symbol: string, payload: unknown): StockHistory {
+export function normalizeDailySeries(
+  symbol: string,
+  payload: unknown,
+  seriesKey = DAILY_SERIES_KEY,
+): StockHistory {
   if (!isRecord(payload)) {
     throw new Error("Market data provider returned an unreadable response");
   }
@@ -27,7 +31,7 @@ export function normalizeDailySeries(symbol: string, payload: unknown): StockHis
     throw new Error(providerMessage);
   }
 
-  const series = payload[DAILY_SERIES_KEY];
+  const series = payload[seriesKey];
   if (!isRecord(series)) {
     throw new Error("Market data provider did not return a daily series");
   }

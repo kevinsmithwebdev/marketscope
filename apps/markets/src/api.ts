@@ -1,22 +1,27 @@
+import type { InstrumentCatalog, StockHistory } from "@marketscope/types";
+
 export const API_BASE_URL = "http://localhost:4000";
 
 export const HISTORY_STALE_TIME_MS = 15 * 60 * 1000;
 
-export type PricePoint = {
-  date: string;
-  close: number;
-};
-
-export type StockHistory = {
-  symbol: string;
-  source: "alpha-vantage";
-  points: PricePoint[];
-};
+export async function fetchCatalog(): Promise<InstrumentCatalog> {
+  return readJson<InstrumentCatalog>(`${API_BASE_URL}/api/markets/catalog`);
+}
 
 export async function fetchStockHistory(symbol: string): Promise<StockHistory> {
+  const history = await readJson<StockHistory>(
+    `${API_BASE_URL}/api/markets/stocks/${encodeURIComponent(symbol)}/history`,
+  );
+  if (history.source !== "alpha-vantage" || !Array.isArray(history.points)) {
+    throw new Error("Market data is unavailable");
+  }
+  return history;
+}
+
+async function readJson<T>(url: string): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}/api/markets/stocks/${symbol}/history`);
+    response = await fetch(url);
   } catch {
     throw new Error("MarketScope API is unavailable");
   }
@@ -25,10 +30,5 @@ export async function fetchStockHistory(symbol: string): Promise<StockHistory> {
     throw new Error("Market data is unavailable");
   }
 
-  const history = (await response.json()) as StockHistory;
-  if (history.source !== "alpha-vantage" || !Array.isArray(history.points)) {
-    throw new Error("Market data is unavailable");
-  }
-
-  return history;
+  return (await response.json()) as T;
 }

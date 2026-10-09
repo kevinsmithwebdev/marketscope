@@ -13,6 +13,10 @@ module.exports = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
+    alias: {
+      "@marketscope/ui": path.resolve(__dirname, "../../packages/ui/src/index.ts"),
+      "@marketscope/types": path.resolve(__dirname, "../../packages/types/src/index.ts"),
+    },
   },
   module: {
     rules: [

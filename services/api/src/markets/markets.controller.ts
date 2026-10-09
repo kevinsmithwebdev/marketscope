@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Res } from "@nestjs/common";
-import { MARKET_CATALOG } from "./catalog";
+import { findInstrument, MARKET_CATALOG } from "./catalog";
 import { MarketHistoryService } from "./market-history.service";
 
 type CacheResponse = {
@@ -21,7 +21,7 @@ export class MarketsController {
     @Res({ passthrough: true }) response: CacheResponse,
   ) {
     console.log("getHistory", symbol);
-    const result = await this.history.getDailyHistory(symbol);
+    const result = await this.history.getDailyHistory(symbol, findInstrument(symbol)?.group);
     response.setHeader("X-Cache", result.cacheStatus);
     return result.data;
   }

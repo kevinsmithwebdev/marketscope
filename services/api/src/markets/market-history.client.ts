@@ -1,3 +1,4 @@
+import type { InstrumentGroup } from "./catalog";
 import { normalizeDailySeries, type StockHistory } from "./normalize-daily-series";
 
 const SYMBOL_PATTERN = /^[A-Z0-9.]{1,10}$/;
@@ -31,7 +32,10 @@ export class MarketHistoryClient {
     this.ttlMs = options.ttlMs ?? DEFAULT_TTL_MS;
   }
 
-  async getDailyHistory(rawSymbol: string): Promise<{
+  async getDailyHistory(
+    rawSymbol: string,
+    group?: InstrumentGroup,
+  ): Promise<{
     data: StockHistory;
     cacheStatus: "HIT" | "MISS";
   }> {
@@ -50,11 +54,22 @@ export class MarketHistoryClient {
       throw new ProviderNotConfiguredError();
     }
 
+    const fx = group === "fx";
+    if (fx && !/^[A-Z]{6}$/.test(symbol)) {
+      throw new InvalidSymbolError();
+    }
+
     console.info(`Fetching ${symbol} daily history from Alpha Vantage`);
 
     const url = new URL("https://www.alphavantage.co/query");
-    url.searchParams.set("function", "TIME_SERIES_DAILY");
-    url.searchParams.set("symbol", symbol);
+    if (fx) {
+      url.searchParams.set("function", "FX_DAILY");
+      url.searchParams.set("from_symbol", symbol.slice(0, 3));
+      url.searchParams.set("to_symbol", symbol.slice(3));
+    } else {
+      url.searchParams.set("function", "TIME_SERIES_DAILY");
+      url.searchParams.set("symbol", symbol);
+    }
     url.searchParams.set("outputsize", "compact");
     url.searchParams.set("apikey", apiKey);
 
@@ -72,7 +87,11 @@ export class MarketHistoryClient {
 
     let data: StockHistory;
     try {
-      data = normalizeDailySeries(symbol, payload);
+      data = normalizeDailySeries(
+        symbol,
+        payload,
+        fx ? "Time Series FX (Daily)" : undefined,
+      );
     } catch (error) {
       console.error(`Alpha Vantage payload rejected: ${describeError(error)}`);
       throw new ProviderRequestError();
