@@ -1,0 +1,22 @@
+.badge {
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 2px 8px;
+}
+
+.positive {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.negative {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.neutral {
+  background: #e2e8f0;
+  color: #334155;
+}

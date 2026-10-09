@@ -1,0 +1,28 @@
+.button {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  padding: 8px 14px;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--ms-accent, #1d4ed8);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.primary {
+  background: var(--ms-accent, #1d4ed8);
+  color: var(--ms-accent-contrast, #ffffff);
+}
+
+.secondary {
+  background: var(--ms-surface, #ffffff);
+  border-color: var(--ms-border, #e1e7f0);
+  color: var(--ms-text, #172033);
+}

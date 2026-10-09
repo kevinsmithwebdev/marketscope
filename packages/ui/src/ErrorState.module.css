@@ -1,0 +1,14 @@
+.error {
+  background: var(--ms-surface, #ffffff);
+  border: 1px solid var(--ms-border, #e1e7f0);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.title {
+  margin: 0 0 8px;
+}
+
+.message {
+  margin: 0 0 12px;
+}
