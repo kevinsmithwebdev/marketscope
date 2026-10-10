@@ -7,7 +7,12 @@
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "paths": {
+      "@marketscope/ui": ["../../packages/ui/src/index.ts"],
+      "@marketscope/types": ["../../packages/types/src/index.ts"],
+      "@marketscope/watchlist-client": ["../../packages/watchlist-client/src/index.ts"]
+    }
   },
   "include": ["src"]
 }
