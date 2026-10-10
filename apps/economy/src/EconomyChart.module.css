@@ -1,0 +1,20 @@
+.section {
+  background: var(--ms-surface, #ffffff);
+  border: 1px solid var(--ms-border, #e1e7f0);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.title {
+  margin: 0;
+}
+
+.unit {
+  color: var(--ms-muted, #5c6b82);
+  margin: 4px 0 12px;
+}
+
+.chart {
+  height: 320px;
+  width: 100%;
+}
