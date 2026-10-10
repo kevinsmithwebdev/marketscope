@@ -1,11 +1,12 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { CryptoModule } from "./crypto/crypto.module";
+import { EconomyModule } from "./economy/economy.module";
 import { HealthController } from "./health.controller";
 import { MarketsModule } from "./markets/markets.module";
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), MarketsModule, CryptoModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), MarketsModule, CryptoModule, EconomyModule],
   controllers: [HealthController],
 })
 export class AppModule {}
