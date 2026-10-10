@@ -1,7 +1,8 @@
 import type { CryptoAsset } from "@marketscope/types";
+import { addWatchItem, readWatchlist } from "@marketscope/watchlist-client";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { Badge, DataTable, type DataTableColumn, ErrorState, Skeleton } from "@marketscope/ui";
-import { useState } from "react";
+import { Badge, Button, DataTable, type DataTableColumn, ErrorState, Skeleton } from "@marketscope/ui";
+import { useEffect, useState } from "react";
 import { CRYPTO_STALE_TIME_MS, fetchAssets } from "./api";
 import { CryptoHistoryChart } from "./CryptoHistoryChart";
 import styles from "./App.module.css";
@@ -60,6 +61,16 @@ function CryptoPage() {
     queryFn: fetchAssets,
   });
   const [selectedId, setSelectedId] = useState("bitcoin");
+  const [savedKeys, setSavedKeys] = useState<string[]>(() => readWatchlist().map((item) => item.key));
+
+  useEffect(() => {
+    function onUpdate() {
+      setSavedKeys(readWatchlist().map((item) => item.key));
+    }
+
+    window.addEventListener("watchlist.updated", onUpdate);
+    return () => window.removeEventListener("watchlist.updated", onUpdate);
+  }, []);
 
   if (assets.isPending) {
     return <Skeleton height={320} />;
@@ -82,7 +93,30 @@ function CryptoPage() {
         onRowClick={(row) => setSelectedId(row.id)}
         rows={assets.data.assets}
       />
-      {selected ? <CryptoHistoryChart id={selected.id} name={selected.name} /> : null}
+      {selected ? (
+        <>
+          <CryptoHistoryChart id={selected.id} name={selected.name} />
+          <Button
+            disabled={savedKeys.includes(selected.id)}
+            onClick={() => {
+              addWatchItem({
+                key: selected.id,
+                symbol: selected.symbol,
+                name: selected.name,
+                kind: "crypto",
+              });
+              window.dispatchEvent(
+                new CustomEvent("marketscope.notify", {
+                  detail: { message: `Added ${selected.name} to the watchlist` },
+                }),
+              );
+            }}
+            variant="secondary"
+          >
+            {savedKeys.includes(selected.id) ? "On watchlist" : "Add to watchlist"}
+          </Button>
+        </>
+      ) : null}
       <p>Source: CoinGecko.</p>
       <p>
         Demonstration data. Prices may be delayed, cached, or incomplete and are not a basis for

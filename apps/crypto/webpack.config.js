@@ -16,6 +16,10 @@ module.exports = {
     alias: {
       "@marketscope/ui": path.resolve(__dirname, "../../packages/ui/src/index.ts"),
       "@marketscope/types": path.resolve(__dirname, "../../packages/types/src/index.ts"),
+      "@marketscope/watchlist-client": path.resolve(
+        __dirname,
+        "../../packages/watchlist-client/src/index.ts",
+      ),
     },
   },
   module: {

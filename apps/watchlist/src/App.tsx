@@ -1,15 +1,44 @@
 import { addWatchItem, readWatchlist, removeWatchItem, type WatchItem } from "@marketscope/watchlist-client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Button, Input, Select } from "@marketscope/ui";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { WATCHLIST_STALE_TIME_MS } from "./api";
+import { CompactChart } from "./CompactChart";
 import styles from "./App.module.css";
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: WATCHLIST_STALE_TIME_MS,
+      retry: 1,
+    },
+  },
+});
+
 export function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <WatchlistPage />
+    </QueryClientProvider>
+  );
+}
+
+function WatchlistPage() {
   const [items, setItems] = useState<WatchItem[]>(() => readWatchlist());
   const [kind, setKind] = useState<WatchItem["kind"]>("equity");
   const [symbol, setSymbol] = useState("");
   const [name, setName] = useState("");
   const [filter, setFilter] = useState("");
   const [sort, setSort] = useState("added");
+
+  useEffect(() => {
+    function onUpdate() {
+      setItems(readWatchlist());
+    }
+
+    window.addEventListener("watchlist.updated", onUpdate);
+    return () => window.removeEventListener("watchlist.updated", onUpdate);
+  }, []);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -92,6 +121,7 @@ export function App() {
                   {item.symbol} · {item.kind}
                 </p>
               </div>
+              <CompactChart item={item} />
               <Button
                 onClick={() => setItems(removeWatchItem(item.key))}
                 variant="secondary"

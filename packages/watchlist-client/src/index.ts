@@ -34,16 +34,26 @@ export function readWatchlist(): WatchItem[] {
   }
 }
 
-function writeWatchlist(items: WatchItem[]): WatchItem[] {
+function publish(symbol: string) {
+  window.dispatchEvent(new CustomEvent("watchlist.updated", { detail: { symbol } }));
+}
+
+function writeWatchlist(items: WatchItem[], symbol: string): WatchItem[] {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  publish(symbol);
   return items;
 }
 
 export function addWatchItem(item: WatchItem): WatchItem[] {
   const withoutDuplicate = readWatchlist().filter((existing) => existing.key !== item.key);
-  return writeWatchlist([item, ...withoutDuplicate]);
+  return writeWatchlist([item, ...withoutDuplicate], item.symbol);
 }
 
 export function removeWatchItem(key: string): WatchItem[] {
-  return writeWatchlist(readWatchlist().filter((item) => item.key !== key));
+  const current = readWatchlist();
+  const removed = current.find((item) => item.key === key);
+  return writeWatchlist(
+    current.filter((item) => item.key !== key),
+    removed?.symbol ?? key,
+  );
 }

@@ -1,7 +1,8 @@
 import type { InstrumentGroup } from "@marketscope/types";
+import { addWatchItem, readWatchlist } from "@marketscope/watchlist-client";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { Card, ErrorState, Select, Skeleton, Tabs } from "@marketscope/ui";
-import { useState } from "react";
+import { Button, Card, ErrorState, Select, Skeleton, Tabs } from "@marketscope/ui";
+import { useEffect, useState } from "react";
 import { fetchCatalog, HISTORY_STALE_TIME_MS } from "./api";
 import { QuoteSummary } from "./QuoteSummary";
 import { StockHistoryChart } from "./StockHistoryChart";
@@ -40,6 +41,16 @@ function MarketsPage() {
   });
   const [group, setGroup] = useState<InstrumentGroup>("index");
   const [symbol, setSymbol] = useState("SPY");
+  const [savedSymbols, setSavedSymbols] = useState<string[]>(() => readWatchlist().map((item) => item.key));
+
+  useEffect(() => {
+    function onUpdate() {
+      setSavedSymbols(readWatchlist().map((item) => item.key));
+    }
+
+    window.addEventListener("watchlist.updated", onUpdate);
+    return () => window.removeEventListener("watchlist.updated", onUpdate);
+  }, []);
 
   if (catalog.isPending) {
     return <Skeleton height={320} />;
@@ -85,6 +96,26 @@ function MarketsPage() {
       </div>
       <Card title="Latest quote">
         <QuoteSummary symbol={selected} />
+        <Button
+          disabled={savedSymbols.includes(selected)}
+          onClick={() => {
+            const instrument = catalog.data.instruments.find((item) => item.symbol === selected);
+            addWatchItem({
+              key: selected,
+              symbol: selected,
+              name: instrument?.name ?? selected,
+              kind: "equity",
+            });
+            window.dispatchEvent(
+              new CustomEvent("marketscope.notify", {
+                detail: { message: `Added ${selected} to the watchlist` },
+              }),
+            );
+          }}
+          variant="secondary"
+        >
+          {savedSymbols.includes(selected) ? "On watchlist" : "Add to watchlist"}
+        </Button>
       </Card>
       <Tabs
         label="Instrument groups"
