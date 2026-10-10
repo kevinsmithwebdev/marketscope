@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node scripts/start.js",
+    "start:api": "node scripts/start.js --api-only",
     "build": "nest build",
     "test": "vitest run"
   },
