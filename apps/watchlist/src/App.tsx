@@ -8,6 +8,8 @@ export function App() {
   const [kind, setKind] = useState<WatchItem["kind"]>("equity");
   const [symbol, setSymbol] = useState("");
   const [name, setName] = useState("");
+  const [filter, setFilter] = useState("");
+  const [sort, setSort] = useState("added");
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,6 +29,19 @@ export function App() {
     setSymbol("");
     setName("");
   }
+
+  const needle = filter.trim().toLowerCase();
+  const visible = items
+    .filter((item) => `${item.symbol} ${item.name}`.toLowerCase().includes(needle))
+    .sort((left, right) => {
+      if (sort === "symbol") {
+        return left.symbol.localeCompare(right.symbol);
+      }
+      if (sort === "name") {
+        return left.name.localeCompare(right.name);
+      }
+      return 0;
+    });
 
   return (
     <section className={styles.page}>
@@ -50,11 +65,26 @@ export function App() {
         <Input label="Name" onChange={(event) => setName(event.target.value)} value={name} />
         <Button type="submit">Add</Button>
       </form>
+      <div className={styles.form}>
+        <Input label="Filter" onChange={(event) => setFilter(event.target.value)} value={filter} />
+        <Select
+          label="Sort"
+          onChange={(event) => setSort(event.target.value)}
+          options={[
+            { value: "added", label: "Recently added" },
+            { value: "symbol", label: "Symbol" },
+            { value: "name", label: "Name" },
+          ]}
+          value={sort}
+        />
+      </div>
       {items.length === 0 ? (
         <p className={styles.empty}>Your watchlist is empty.</p>
+      ) : visible.length === 0 ? (
+        <p className={styles.empty}>No instruments match that filter.</p>
       ) : (
         <ul className={styles.list}>
-          {items.map((item) => (
+          {visible.map((item) => (
             <li className={styles.row} key={item.key}>
               <div>
                 <strong>{item.name}</strong>
