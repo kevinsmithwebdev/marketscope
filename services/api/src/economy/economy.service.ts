@@ -1,8 +1,4 @@
-import {
-  BadGatewayException,
-  Injectable,
-  ServiceUnavailableException,
-} from "@nestjs/common";
+import { BadGatewayException, Injectable, ServiceUnavailableException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { FredClient, ProviderNotConfiguredError } from "./fred.client";
 import type { EconomySeriesId } from "./series";

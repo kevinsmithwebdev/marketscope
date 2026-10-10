@@ -17,10 +17,7 @@ export class CryptoController {
   }
 
   @Get(":id/history")
-  async getHistory(
-    @Param("id") id: string,
-    @Res({ passthrough: true }) response: CacheResponse,
-  ) {
+  async getHistory(@Param("id") id: string, @Res({ passthrough: true }) response: CacheResponse) {
     const result = await this.crypto.getHistory(id);
     response.setHeader("X-Cache", result.cacheStatus);
     return result.data;

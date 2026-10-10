@@ -81,7 +81,9 @@ export function normalizeCoinDetail(payload: unknown): CryptoAsset {
   }
 
   const marketData = payload.market_data;
-  const currentPrice = isRecord(marketData.current_price) ? marketData.current_price.usd : undefined;
+  const currentPrice = isRecord(marketData.current_price)
+    ? marketData.current_price.usd
+    : undefined;
   const marketCap = isRecord(marketData.market_cap) ? marketData.market_cap.usd : undefined;
   const volume = isRecord(marketData.total_volume) ? marketData.total_volume.usd : undefined;
   const change = readNumber(marketData.price_change_percentage_24h);

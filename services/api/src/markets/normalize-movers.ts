@@ -26,7 +26,11 @@ function readMover(value: unknown): MarketMover | undefined {
 
   const price = Number(value.price);
   const change = Number(value.change_amount);
-  if (!Number.isFinite(price) || !Number.isFinite(change) || typeof value.change_percentage !== "string") {
+  if (
+    !Number.isFinite(price) ||
+    !Number.isFinite(change) ||
+    typeof value.change_percentage !== "string"
+  ) {
     return undefined;
   }
 
@@ -45,10 +49,12 @@ function readMovers(value: unknown): MarketMover[] {
     return [];
   }
 
-  return value.flatMap((item) => {
-    const mover = readMover(item);
-    return mover ? [mover] : [];
-  }).slice(0, MOVER_LIMIT);
+  return value
+    .flatMap((item) => {
+      const mover = readMover(item);
+      return mover ? [mover] : [];
+    })
+    .slice(0, MOVER_LIMIT);
 }
 
 export function normalizeMovers(payload: unknown): MarketMovers {

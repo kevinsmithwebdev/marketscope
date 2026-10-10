@@ -37,7 +37,9 @@ function EconomyPage() {
   return (
     <section className={styles.page}>
       <h1>Economy</h1>
-      <p className={styles.note}>United States indicators from FRED, covering about the last ten years.</p>
+      <p className={styles.note}>
+        United States indicators from FRED, covering about the last ten years.
+      </p>
       <Tabs
         label="Economic indicators"
         onChange={(id) => setSeriesId(id as EconomySeriesId)}

@@ -1,7 +1,15 @@
 import type { EconomySeriesId } from "@marketscope/types";
 import { useQuery } from "@tanstack/react-query";
 import { ErrorState, Skeleton } from "@marketscope/ui";
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { fetchEconomySeries } from "./api";
 import styles from "./EconomyChart.module.css";
 
@@ -16,7 +24,8 @@ export function EconomyChart({ id }: { id: EconomySeriesId }) {
   }
 
   if (series.isError) {
-    const message = series.error instanceof Error ? series.error.message : "Economic data is unavailable.";
+    const message =
+      series.error instanceof Error ? series.error.message : "Economic data is unavailable.";
     return <ErrorState message={message} title="This indicator is unavailable" />;
   }
 

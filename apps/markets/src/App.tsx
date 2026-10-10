@@ -42,7 +42,9 @@ function MarketsPage() {
   });
   const [group, setGroup] = useState<InstrumentGroup>("index");
   const [symbol, setSymbol] = useState("SPY");
-  const [savedSymbols, setSavedSymbols] = useState<string[]>(() => readWatchlist().map((item) => item.key));
+  const [savedSymbols, setSavedSymbols] = useState<string[]>(() =>
+    readWatchlist().map((item) => item.key),
+  );
 
   useEffect(() => {
     function onUpdate() {
@@ -58,7 +60,8 @@ function MarketsPage() {
   }
 
   if (catalog.isError) {
-    const message = catalog.error instanceof Error ? catalog.error.message : "Market data is unavailable.";
+    const message =
+      catalog.error instanceof Error ? catalog.error.message : "Market data is unavailable.";
     return <ErrorState message={message} title="Markets are unavailable" titleAs="h1" />;
   }
 
@@ -123,7 +126,9 @@ function MarketsPage() {
         onChange={(id) => {
           const nextGroup = id as InstrumentGroup;
           setGroup(nextGroup);
-          const next = catalog.data.instruments.find((instrument) => instrument.group === nextGroup);
+          const next = catalog.data.instruments.find(
+            (instrument) => instrument.group === nextGroup,
+          );
           if (next) {
             setSymbol(next.symbol);
           }

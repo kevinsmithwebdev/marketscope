@@ -1,5 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { fetchCryptoHistory } from "./api";
 import styles from "./CryptoHistoryChart.module.css";
 
@@ -14,7 +22,8 @@ export function CryptoHistoryChart({ id, name }: { id: string; name: string }) {
   }
 
   if (history.isError) {
-    const message = history.error instanceof Error ? history.error.message : "Crypto data is unavailable.";
+    const message =
+      history.error instanceof Error ? history.error.message : "Crypto data is unavailable.";
     return <p role="alert">{message}</p>;
   }
 

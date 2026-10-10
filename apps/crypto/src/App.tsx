@@ -1,7 +1,15 @@
 import type { CryptoAsset } from "@marketscope/types";
 import { addWatchItem, readWatchlist } from "@marketscope/watchlist-client";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { Badge, Button, DataTable, type DataTableColumn, ErrorState, Skeleton, useRemoteFault } from "@marketscope/ui";
+import {
+  Badge,
+  Button,
+  DataTable,
+  type DataTableColumn,
+  ErrorState,
+  Skeleton,
+  useRemoteFault,
+} from "@marketscope/ui";
 import { useEffect, useState } from "react";
 import { CRYPTO_STALE_TIME_MS, fetchAssets } from "./api";
 import { CryptoHistoryChart } from "./CryptoHistoryChart";
@@ -62,7 +70,9 @@ function CryptoPage() {
     queryFn: fetchAssets,
   });
   const [selectedId, setSelectedId] = useState("bitcoin");
-  const [savedKeys, setSavedKeys] = useState<string[]>(() => readWatchlist().map((item) => item.key));
+  const [savedKeys, setSavedKeys] = useState<string[]>(() =>
+    readWatchlist().map((item) => item.key),
+  );
 
   useEffect(() => {
     function onUpdate() {
@@ -78,11 +88,13 @@ function CryptoPage() {
   }
 
   if (assets.isError) {
-    const message = assets.error instanceof Error ? assets.error.message : "Crypto data is unavailable.";
+    const message =
+      assets.error instanceof Error ? assets.error.message : "Crypto data is unavailable.";
     return <ErrorState message={message} title="Crypto is unavailable" titleAs="h1" />;
   }
 
-  const selected = assets.data.assets.find((asset) => asset.id === selectedId) ?? assets.data.assets[0];
+  const selected =
+    assets.data.assets.find((asset) => asset.id === selectedId) ?? assets.data.assets[0];
 
   return (
     <section className={styles.page}>

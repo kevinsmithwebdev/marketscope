@@ -4,10 +4,19 @@
   "private": true,
   "scripts": {
     "start": "concurrently -n shell,markets,crypto,economy,watchlist -c auto \"npm start --prefix apps/shell\" \"npm start --prefix apps/markets\" \"npm start --prefix apps/crypto\" \"npm start --prefix apps/economy\" \"npm start --prefix apps/watchlist\"",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.64.0",
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "eslint": "^9.39.5",
+    "globals": "^16.5.0",
+    "prettier": "^3.9.10",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.1"
   }
 }

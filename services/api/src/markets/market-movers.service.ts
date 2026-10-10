@@ -1,13 +1,6 @@
-import {
-  BadGatewayException,
-  Injectable,
-  ServiceUnavailableException,
-} from "@nestjs/common";
+import { BadGatewayException, Injectable, ServiceUnavailableException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import {
-  MarketMoversClient,
-  ProviderNotConfiguredError,
-} from "./market-movers.client";
+import { MarketMoversClient, ProviderNotConfiguredError } from "./market-movers.client";
 
 @Injectable()
 export class MarketMoversService {

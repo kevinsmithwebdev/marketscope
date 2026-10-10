@@ -13,7 +13,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-export function normalizeObservations(definition: EconomySeriesDefinition, payload: unknown): EconomySeries {
+export function normalizeObservations(
+  definition: EconomySeriesDefinition,
+  payload: unknown,
+): EconomySeries {
   if (!isRecord(payload)) {
     throw new Error("Economy provider returned an unreadable response");
   }
@@ -27,7 +30,11 @@ export function normalizeObservations(definition: EconomySeriesDefinition, paylo
   }
 
   const points = payload.observations.flatMap((observation) => {
-    if (!isRecord(observation) || typeof observation.date !== "string" || typeof observation.value !== "string") {
+    if (
+      !isRecord(observation) ||
+      typeof observation.date !== "string" ||
+      typeof observation.value !== "string"
+    ) {
       return [];
     }
     if (observation.value === ".") {

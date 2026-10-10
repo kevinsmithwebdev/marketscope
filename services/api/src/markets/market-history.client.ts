@@ -87,11 +87,7 @@ export class MarketHistoryClient {
 
     let data: StockHistory;
     try {
-      data = normalizeDailySeries(
-        symbol,
-        payload,
-        fx ? "Time Series FX (Daily)" : undefined,
-      );
+      data = normalizeDailySeries(symbol, payload, fx ? "Time Series FX (Daily)" : undefined);
     } catch (error) {
       console.error(`Alpha Vantage payload rejected: ${describeError(error)}`);
       throw new ProviderRequestError();

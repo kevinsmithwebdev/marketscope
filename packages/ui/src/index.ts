@@ -7,5 +7,10 @@ export { Input } from "./Input";
 export { Modal } from "./Modal";
 export { Select } from "./Select";
 export { Skeleton } from "./Skeleton";
-export { simulateApiFault, simulateRemoteFault, simulationHeaders, useRemoteFault } from "./simulation";
+export {
+  simulateApiFault,
+  simulateRemoteFault,
+  simulationHeaders,
+  useRemoteFault,
+} from "./simulation";
 export { Tabs } from "./Tabs";

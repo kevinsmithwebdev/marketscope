@@ -19,11 +19,7 @@ export function DeveloperPanel() {
         </p>
         <div className={styles.actions}>
           {remotes.map((name) => (
-            <Button
-              key={name}
-              onClick={() => simulateRemoteFault(name)}
-              variant="secondary"
-            >
+            <Button key={name} onClick={() => simulateRemoteFault(name)} variant="secondary">
               Stop {name}
             </Button>
           ))}

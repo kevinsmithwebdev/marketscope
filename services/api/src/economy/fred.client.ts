@@ -32,7 +32,9 @@ export class FredClient {
     this.ttlMs = options.ttlMs ?? DEFAULT_TTL_MS;
   }
 
-  async getSeries(id: EconomySeriesId): Promise<{ data: EconomySeries; cacheStatus: "HIT" | "MISS" }> {
+  async getSeries(
+    id: EconomySeriesId,
+  ): Promise<{ data: EconomySeries; cacheStatus: "HIT" | "MISS" }> {
     const cached = this.cache.get(id);
     if (cached && cached.expiresAt > this.now()) {
       return { data: cached.value, cacheStatus: "HIT" };

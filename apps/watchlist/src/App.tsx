@@ -1,4 +1,9 @@
-import { addWatchItem, readWatchlist, removeWatchItem, type WatchItem } from "@marketscope/watchlist-client";
+import {
+  addWatchItem,
+  readWatchlist,
+  removeWatchItem,
+  type WatchItem,
+} from "@marketscope/watchlist-client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Button, Input, Select, useRemoteFault } from "@marketscope/ui";
 import { useEffect, useState, type FormEvent } from "react";
@@ -123,10 +128,7 @@ function WatchlistPage() {
                 </p>
               </div>
               <CompactChart item={item} />
-              <Button
-                onClick={() => setItems(removeWatchItem(item.key))}
-                variant="secondary"
-              >
+              <Button onClick={() => setItems(removeWatchItem(item.key))} variant="secondary">
                 Remove
               </Button>
             </li>

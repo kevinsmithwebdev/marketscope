@@ -31,7 +31,8 @@ export function TopMovers() {
   }
 
   if (movers.isError) {
-    const message = movers.error instanceof Error ? movers.error.message : "Movers are unavailable.";
+    const message =
+      movers.error instanceof Error ? movers.error.message : "Movers are unavailable.";
     return <p role="alert">{message}</p>;
   }
 
@@ -43,7 +44,9 @@ export function TopMovers() {
       <Card title="Top losers">
         <DataTable columns={columns} getRowKey={(row) => row.symbol} rows={movers.data.losers} />
       </Card>
-      {movers.data.updatedAt ? <p className={styles.updated}>Updated {movers.data.updatedAt}.</p> : null}
+      {movers.data.updatedAt ? (
+        <p className={styles.updated}>Updated {movers.data.updatedAt}.</p>
+      ) : null}
     </div>
   );
 }

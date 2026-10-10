@@ -30,12 +30,7 @@ export function Modal({
   }, [open]);
 
   return (
-    <dialog
-      aria-labelledby={titleId}
-      className={styles.dialog}
-      onClose={onClose}
-      ref={dialogRef}
-    >
+    <dialog aria-labelledby={titleId} className={styles.dialog} onClose={onClose} ref={dialogRef}>
       <div className={styles.header}>
         <h2 className={styles.title} id={titleId}>
           {title}

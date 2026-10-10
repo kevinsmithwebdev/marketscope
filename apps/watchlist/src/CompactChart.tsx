@@ -9,7 +9,9 @@ export function CompactChart({ item }: { item: WatchItem }) {
     queryKey: ["watchlist", "history", item.kind, item.key],
     queryFn: async () => {
       const history =
-        item.kind === "crypto" ? await fetchCryptoHistory(item.key) : await fetchEquityHistory(item.key);
+        item.kind === "crypto"
+          ? await fetchCryptoHistory(item.key)
+          : await fetchEquityHistory(item.key);
       return history.points;
     },
   });
