@@ -1,0 +1,8 @@
+services:
+  api:
+    build: ./services/api
+    ports:
+      - "4000:4000"
+    environment:
+      ALPHA_VANTAGE_API_KEY: ${ALPHA_VANTAGE_API_KEY:-}
+      FRED_API_KEY: ${FRED_API_KEY:-}

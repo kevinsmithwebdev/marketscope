@@ -34,7 +34,7 @@ export function StockHistoryChart({ symbol }: { symbol: string }) {
 
   return (
     <section className={styles.section}>
-      <h1 className={styles.title}>{history.data.symbol} daily close</h1>
+      <h2 className={styles.title}>{history.data.symbol} daily close</h2>
       <div className={styles.chart}>
         <ResponsiveContainer>
           <LineChart data={history.data.points}>
