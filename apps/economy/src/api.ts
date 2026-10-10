@@ -1,4 +1,5 @@
 import type { EconomySeries, EconomySeriesId } from "@marketscope/types";
+import { simulationHeaders } from "@marketscope/ui";
 
 const API_BASE_URL = "http://localhost:4000";
 
@@ -15,7 +16,7 @@ export async function fetchEconomySeries(id: EconomySeriesId): Promise<EconomySe
 async function readJson<T>(url: string): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(url);
+    response = await fetch(url, { headers: simulationHeaders() });
   } catch {
     throw new Error("MarketScope API is unavailable");
   }

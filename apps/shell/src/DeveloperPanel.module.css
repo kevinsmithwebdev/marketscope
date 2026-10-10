@@ -1,0 +1,24 @@
+.trigger {
+  background: transparent;
+  border: 1px solid var(--ms-border);
+  border-radius: 999px;
+  color: var(--ms-muted);
+  cursor: pointer;
+  font: inherit;
+  padding: 4px 10px;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--ms-accent);
+  outline-offset: 2px;
+}
+
+.copy {
+  margin-top: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

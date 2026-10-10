@@ -1,4 +1,5 @@
 import type { CryptoHistory, StockHistory } from "@marketscope/types";
+import { simulationHeaders } from "@marketscope/ui";
 
 const API_BASE_URL = "http://localhost:4000";
 
@@ -15,7 +16,7 @@ export async function fetchCryptoHistory(id: string): Promise<CryptoHistory> {
 async function readHistory<T>(path: string): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`);
+    response = await fetch(`${API_BASE_URL}${path}`, { headers: simulationHeaders() });
   } catch {
     throw new Error("MarketScope API is unavailable");
   }

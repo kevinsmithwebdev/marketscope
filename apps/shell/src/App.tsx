@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from "react";
 import { BrowserRouter, NavLink, Route, Routes } from "react-router";
+import { DeveloperPanel } from "./DeveloperPanel";
 import { DemoUserProvider, useDemoUser } from "./demo-user";
 import { Notifications } from "./Notifications";
 import { DashboardPage } from "./pages/DashboardPage";
@@ -63,6 +64,7 @@ function ShellFrame() {
             Watchlist
           </NavLink>
         </nav>
+        <DeveloperPanel />
         <span className={styles.user}>{user.name}</span>
       </header>
       <Notifications>

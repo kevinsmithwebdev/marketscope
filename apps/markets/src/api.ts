@@ -1,4 +1,5 @@
 import type { InstrumentCatalog, InstrumentQuote, MarketMovers, StockHistory } from "@marketscope/types";
+import { simulationHeaders } from "@marketscope/ui";
 
 export const API_BASE_URL = "http://localhost:4000";
 
@@ -39,7 +40,7 @@ export async function fetchStockHistory(symbol: string): Promise<StockHistory> {
 async function readJson<T>(url: string): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(url);
+    response = await fetch(url, { headers: simulationHeaders() });
   } catch {
     throw new Error("MarketScope API is unavailable");
   }

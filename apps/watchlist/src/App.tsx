@@ -1,6 +1,6 @@
 import { addWatchItem, readWatchlist, removeWatchItem, type WatchItem } from "@marketscope/watchlist-client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Button, Input, Select } from "@marketscope/ui";
+import { Button, Input, Select, useRemoteFault } from "@marketscope/ui";
 import { useEffect, useState, type FormEvent } from "react";
 import { WATCHLIST_STALE_TIME_MS } from "./api";
 import { CompactChart } from "./CompactChart";
@@ -16,6 +16,7 @@ const queryClient = new QueryClient({
 });
 
 export function App() {
+  useRemoteFault("Watchlist");
   return (
     <QueryClientProvider client={queryClient}>
       <WatchlistPage />

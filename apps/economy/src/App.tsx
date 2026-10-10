@@ -1,6 +1,6 @@
 import type { EconomySeriesId } from "@marketscope/types";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Tabs } from "@marketscope/ui";
+import { Tabs, useRemoteFault } from "@marketscope/ui";
 import { useState } from "react";
 import { ECONOMY_STALE_TIME_MS } from "./api";
 import { EconomyChart } from "./EconomyChart";
@@ -23,6 +23,7 @@ const tabs: { id: EconomySeriesId; label: string }[] = [
 ];
 
 export function App() {
+  useRemoteFault("Economy");
   return (
     <QueryClientProvider client={queryClient}>
       <EconomyPage />

@@ -1,7 +1,7 @@
 import type { CryptoAsset } from "@marketscope/types";
 import { addWatchItem, readWatchlist } from "@marketscope/watchlist-client";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { Badge, Button, DataTable, type DataTableColumn, ErrorState, Skeleton } from "@marketscope/ui";
+import { Badge, Button, DataTable, type DataTableColumn, ErrorState, Skeleton, useRemoteFault } from "@marketscope/ui";
 import { useEffect, useState } from "react";
 import { CRYPTO_STALE_TIME_MS, fetchAssets } from "./api";
 import { CryptoHistoryChart } from "./CryptoHistoryChart";
@@ -48,6 +48,7 @@ const columns: DataTableColumn<CryptoAsset>[] = [
 ];
 
 export function App() {
+  useRemoteFault("Crypto");
   return (
     <QueryClientProvider client={queryClient}>
       <CryptoPage />

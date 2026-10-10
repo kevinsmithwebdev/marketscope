@@ -1,7 +1,7 @@
 import type { InstrumentGroup } from "@marketscope/types";
 import { addWatchItem, readWatchlist } from "@marketscope/watchlist-client";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { Button, Card, ErrorState, Select, Skeleton, Tabs } from "@marketscope/ui";
+import { Button, Card, ErrorState, Select, Skeleton, Tabs, useRemoteFault } from "@marketscope/ui";
 import { useEffect, useState } from "react";
 import { fetchCatalog, HISTORY_STALE_TIME_MS } from "./api";
 import { QuoteSummary } from "./QuoteSummary";
@@ -27,6 +27,7 @@ const groups: { id: InstrumentGroup; label: string }[] = [
 ];
 
 export function App() {
+  useRemoteFault("Markets");
   return (
     <QueryClientProvider client={queryClient}>
       <MarketsPage />
