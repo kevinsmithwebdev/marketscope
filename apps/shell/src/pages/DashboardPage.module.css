@@ -8,3 +8,32 @@
   gap: 16px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
+
+.card {
+  background: var(--ms-surface, #ffffff);
+  border: 1px solid var(--ms-border, #e1e7f0);
+  border-radius: 12px;
+  color: inherit;
+  display: block;
+  padding: 16px;
+  text-decoration: none;
+}
+
+.card:hover {
+  background: var(--ms-hover, #f8fafc);
+  border-color: var(--ms-accent, #1d4ed8);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--ms-accent, #1d4ed8);
+  outline-offset: 2px;
+}
+
+.title {
+  font-size: 1rem;
+  margin: 0 0 12px;
+}
+
+.text {
+  margin: 0;
+}

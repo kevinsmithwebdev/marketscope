@@ -1,4 +1,3 @@
-import { Card } from "@marketscope/ui";
 import { Link } from "react-router";
 import { useDemoUser } from "../demo-user";
 import styles from "./DashboardPage.module.css";
@@ -38,10 +37,10 @@ export function DashboardPage() {
       </p>
       <div className={styles.grid}>
         {areas.map((area) => (
-          <Card key={area.to} title={area.title}>
-            <p>{area.text}</p>
-            <Link to={area.to}>Open</Link>
-          </Card>
+          <Link className={styles.card} key={area.to} to={area.to}>
+            <h2 className={styles.title}>{area.title}</h2>
+            <p className={styles.text}>{area.text}</p>
+          </Link>
         ))}
       </div>
     </section>

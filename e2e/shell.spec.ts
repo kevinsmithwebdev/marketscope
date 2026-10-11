@@ -9,8 +9,9 @@ test("shell loads", async ({ page }) => {
 test("navigation keeps the shell mounted", async ({ page }) => {
   await page.goto("/");
 
+  const nav = page.getByRole("navigation", { name: "Primary" });
   for (const name of ["Markets", "Crypto", "Economy", "Watchlist"]) {
-    await page.getByRole("link", { name }).click();
+    await nav.getByRole("link", { name, exact: true }).click();
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name })).toBeVisible();
   }
