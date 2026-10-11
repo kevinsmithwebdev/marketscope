@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { ModuleFederationPlugin } = require("webpack").container;
+const { resolveFrom, rules } = require("../../tooling/webpack-app");
 
 module.exports = {
   mode: "development",
@@ -10,40 +11,9 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     clean: true,
   },
-  resolve: {
-    extensions: [".tsx", ".ts", ".js"],
-    alias: {
-      "@marketscope/ui": path.resolve(__dirname, "../../packages/ui/src/index.ts"),
-      "@marketscope/types": path.resolve(__dirname, "../../packages/types/src/index.ts"),
-    },
-  },
+  resolve: resolveFrom(__dirname),
   module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        exclude: /node_modules/,
-        use: "ts-loader",
-      },
-      {
-        test: /\.module\.css$/,
-        use: [
-          "style-loader",
-          {
-            loader: "css-loader",
-            options: {
-              modules: {
-                namedExport: false,
-              },
-            },
-          },
-        ],
-      },
-      {
-        test: /\.css$/,
-        exclude: /\.module\.css$/,
-        use: ["style-loader", "css-loader"],
-      },
-    ],
+    rules: rules({ includeGlobalCss: true }),
   },
   plugins: [
     new HtmlWebpackPlugin({
