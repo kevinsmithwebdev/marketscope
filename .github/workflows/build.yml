@@ -44,6 +44,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: npm ci --prefix packages/ui
       - working-directory: apps/shell
         run: |
           npm ci
@@ -60,6 +61,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: npm ci --prefix packages/ui
       - working-directory: apps/${{ matrix.app }}
         run: |
           npm ci
