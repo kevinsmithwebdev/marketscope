@@ -5,7 +5,7 @@ import {
   type EconomySeriesId,
 } from "@marketscope/types";
 import { useQuery } from "@tanstack/react-query";
-import { ErrorState, RadioGroup, Skeleton } from "@marketscope/ui";
+import { chartTheme, ErrorState, RadioGroup, Skeleton } from "@marketscope/ui";
 import { useState } from "react";
 import {
   CartesianGrid,
@@ -46,16 +46,31 @@ export function EconomyChart({ id }: { id: EconomySeriesId }) {
         <div className={styles.chart}>
           <ResponsiveContainer>
             <LineChart data={series.data.points}>
-              <CartesianGrid stroke="#e6eaf0" />
-              <XAxis dataKey="date" minTickGap={32} />
-              <YAxis domain={["auto", "auto"]} width={72} />
-              <Tooltip />
+              <CartesianGrid stroke={chartTheme.grid} />
+              <XAxis
+                dataKey="date"
+                minTickGap={32}
+                stroke={chartTheme.axis}
+                tick={chartTheme.tick}
+              />
+              <YAxis
+                domain={["auto", "auto"]}
+                stroke={chartTheme.axis}
+                tick={chartTheme.tick}
+                width={72}
+              />
+              <Tooltip
+                contentStyle={chartTheme.tooltip.contentStyle}
+                cursor={chartTheme.tooltip.cursor}
+                itemStyle={chartTheme.tooltip.itemStyle}
+                labelStyle={chartTheme.tooltip.labelStyle}
+              />
               <Line
                 animationDuration={500}
                 type="monotone"
                 dataKey="value"
                 dot={false}
-                stroke="#1d4ed8"
+                stroke={chartTheme.line}
                 strokeWidth={2}
               />
             </LineChart>

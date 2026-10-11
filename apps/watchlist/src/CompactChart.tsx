@@ -1,5 +1,6 @@
 import type { WatchItem } from "@marketscope/watchlist-client";
 import { useQuery } from "@tanstack/react-query";
+import { chartTheme } from "@marketscope/ui";
 import { Line, LineChart, ResponsiveContainer } from "recharts";
 import { fetchCryptoHistory, fetchEquityHistory } from "./api";
 import styles from "./CompactChart.module.css";
@@ -32,7 +33,7 @@ export function CompactChart({ item }: { item: WatchItem }) {
             animationDuration={500}
             dataKey="close"
             dot={false}
-            stroke="#1d4ed8"
+            stroke={chartTheme.line}
             strokeWidth={2}
           />
         </LineChart>

@@ -22,7 +22,7 @@
 }
 
 .table tbody tr:hover {
-  background: #f8fafc;
+  background: var(--ms-hover, #f8fafc);
 }
 
 .clickable {

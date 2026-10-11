@@ -1,4 +1,5 @@
 export { Badge } from "./Badge";
+export { chartTheme } from "./chartTheme";
 export { Button } from "./Button";
 export { Card } from "./Card";
 export { DataTable, type DataTableColumn } from "./DataTable";

@@ -9,7 +9,7 @@
 }
 
 .dialog::backdrop {
-  background: rgb(23 32 51 / 40%);
+  background: var(--ms-overlay, rgb(23 32 51 / 45%));
 }
 
 .header {

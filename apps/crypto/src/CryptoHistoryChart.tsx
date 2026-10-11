@@ -1,6 +1,6 @@
 import { chartRangeOptions, CRYPTO_CHART_RANGES, type ChartRange } from "@marketscope/types";
 import { useQuery } from "@tanstack/react-query";
-import { RadioGroup } from "@marketscope/ui";
+import { chartTheme, RadioGroup } from "@marketscope/ui";
 import { useState } from "react";
 import {
   CartesianGrid,
@@ -61,16 +61,33 @@ export function CryptoHistoryChart({ id, name }: { id: string; name: string }) {
       <div className={styles.chart}>
         <ResponsiveContainer>
           <LineChart data={history.data.points}>
-            <CartesianGrid stroke="#e6eaf0" />
-            <XAxis dataKey="date" minTickGap={32} tickFormatter={formatChartDate} />
-            <YAxis domain={["auto", "auto"]} width={80} />
-            <Tooltip labelFormatter={formatChartDate} />
+            <CartesianGrid stroke={chartTheme.grid} />
+            <XAxis
+              dataKey="date"
+              minTickGap={32}
+              stroke={chartTheme.axis}
+              tick={chartTheme.tick}
+              tickFormatter={formatChartDate}
+            />
+            <YAxis
+              domain={["auto", "auto"]}
+              stroke={chartTheme.axis}
+              tick={chartTheme.tick}
+              width={80}
+            />
+            <Tooltip
+              contentStyle={chartTheme.tooltip.contentStyle}
+              cursor={chartTheme.tooltip.cursor}
+              itemStyle={chartTheme.tooltip.itemStyle}
+              labelFormatter={formatChartDate}
+              labelStyle={chartTheme.tooltip.labelStyle}
+            />
             <Line
               animationDuration={500}
               type="monotone"
               dataKey="close"
               dot={false}
-              stroke="#1d4ed8"
+              stroke={chartTheme.line}
               strokeWidth={2}
             />
           </LineChart>

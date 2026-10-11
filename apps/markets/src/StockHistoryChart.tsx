@@ -1,6 +1,6 @@
 import { chartRangeOptions, MARKET_CHART_RANGES, type ChartRange } from "@marketscope/types";
 import { useQuery } from "@tanstack/react-query";
-import { RadioGroup } from "@marketscope/ui";
+import { chartTheme, RadioGroup } from "@marketscope/ui";
 import { useState } from "react";
 import {
   CartesianGrid,
@@ -43,16 +43,26 @@ export function StockHistoryChart({ symbol }: { symbol: string }) {
       <div className={styles.chart}>
         <ResponsiveContainer>
           <LineChart data={history.data.points}>
-            <CartesianGrid stroke="#e6eaf0" />
-            <XAxis dataKey="date" minTickGap={32} />
-            <YAxis domain={["auto", "auto"]} width={72} />
-            <Tooltip />
+            <CartesianGrid stroke={chartTheme.grid} />
+            <XAxis dataKey="date" minTickGap={32} stroke={chartTheme.axis} tick={chartTheme.tick} />
+            <YAxis
+              domain={["auto", "auto"]}
+              stroke={chartTheme.axis}
+              tick={chartTheme.tick}
+              width={72}
+            />
+            <Tooltip
+              contentStyle={chartTheme.tooltip.contentStyle}
+              cursor={chartTheme.tooltip.cursor}
+              itemStyle={chartTheme.tooltip.itemStyle}
+              labelStyle={chartTheme.tooltip.labelStyle}
+            />
             <Line
               animationDuration={500}
               type="monotone"
               dataKey="close"
               dot={false}
-              stroke="#2563eb"
+              stroke={chartTheme.line}
               strokeWidth={2}
             />
           </LineChart>

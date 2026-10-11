@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   --ms-bg: #f4f7fb;
   --ms-surface: #ffffff;
   --ms-text: #172033;
@@ -6,8 +7,44 @@
   --ms-border: #e1e7f0;
   --ms-accent: #1d4ed8;
   --ms-accent-contrast: #ffffff;
+  --ms-positive-bg: #dcfce7;
+  --ms-positive-text: #166534;
+  --ms-negative-bg: #fee2e2;
+  --ms-negative-text: #991b1b;
+  --ms-neutral-bg: #e2e8f0;
+  --ms-neutral-text: #334155;
+  --ms-hover: #f8fafc;
+  --ms-skeleton-base: #e8eef6;
+  --ms-skeleton-shine: #f8fafc;
+  --ms-overlay: rgb(23 32 51 / 45%);
+  background: var(--ms-bg);
   color: var(--ms-text);
   font-family: "Segoe UI", sans-serif;
+}
+
+/*
+  Remotes render in this document, so they pick up the same tokens.
+  The head script sets data-theme before the first paint.
+*/
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ms-bg: #0e141b;
+  --ms-surface: #182230;
+  --ms-text: #e8eef6;
+  --ms-muted: #a3b1c6;
+  --ms-border: #2e3d52;
+  --ms-accent: #93c5fd;
+  --ms-accent-contrast: #0b1220;
+  --ms-positive-bg: #14532d;
+  --ms-positive-text: #bbf7d0;
+  --ms-negative-bg: #7f1d1d;
+  --ms-negative-text: #fecaca;
+  --ms-neutral-bg: #334155;
+  --ms-neutral-text: #e2e8f0;
+  --ms-hover: #223044;
+  --ms-skeleton-base: #243044;
+  --ms-skeleton-shine: #314258;
+  --ms-overlay: rgb(0 0 0 / 62%);
 }
 
 body {

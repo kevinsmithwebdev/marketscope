@@ -7,16 +7,16 @@
 }
 
 .positive {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--ms-positive-bg, #dcfce7);
+  color: var(--ms-positive-text, #166534);
 }
 
 .negative {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--ms-negative-bg, #fee2e2);
+  color: var(--ms-negative-text, #991b1b);
 }
 
 .neutral {
-  background: #e2e8f0;
-  color: #334155;
+  background: var(--ms-neutral-bg, #e2e8f0);
+  color: var(--ms-neutral-text, #334155);
 }
