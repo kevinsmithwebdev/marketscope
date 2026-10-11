@@ -1,9 +1,10 @@
 import type { InstrumentGroup } from "@marketscope/types";
-import { addWatchItem, readWatchlist } from "@marketscope/watchlist-client";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { Button, Card, ErrorState, Select, Skeleton, Tabs, useRemoteFault } from "@marketscope/ui";
-import { useEffect, useState } from "react";
+import { Card, ErrorState, Select, Skeleton, Tabs, useRemoteFault } from "@marketscope/ui";
+import { useState } from "react";
+import { AddToWatchlist } from "./AddToWatchlist";
 import { fetchCatalog, HISTORY_STALE_TIME_MS } from "./api";
+import { IndexStrip } from "./IndexStrip";
 import { QuoteSummary } from "./QuoteSummary";
 import { StockHistoryChart } from "./StockHistoryChart";
 import { TopMovers } from "./TopMovers";
@@ -42,18 +43,6 @@ function MarketsPage() {
   });
   const [group, setGroup] = useState<InstrumentGroup>("index");
   const [symbol, setSymbol] = useState("SPY");
-  const [savedSymbols, setSavedSymbols] = useState<string[]>(() =>
-    readWatchlist().map((item) => item.key),
-  );
-
-  useEffect(() => {
-    function onUpdate() {
-      setSavedSymbols(readWatchlist().map((item) => item.key));
-    }
-
-    window.addEventListener("watchlist.updated", onUpdate);
-    return () => window.removeEventListener("watchlist.updated", onUpdate);
-  }, []);
 
   if (catalog.isPending) {
     return <Skeleton height={320} />;
@@ -65,11 +54,12 @@ function MarketsPage() {
     return <ErrorState message={message} title="Markets are unavailable" titleAs="h1" />;
   }
 
-  const indices = catalog.data.instruments.filter((instrument) => instrument.group === "index");
   const instruments = catalog.data.instruments.filter((instrument) => instrument.group === group);
   const selected = instruments.some((instrument) => instrument.symbol === symbol)
     ? symbol
     : (instruments[0]?.symbol ?? symbol);
+  const selectedName =
+    catalog.data.instruments.find((item) => item.symbol === selected)?.name ?? selected;
 
   return (
     <section className={styles.page}>
@@ -78,48 +68,18 @@ function MarketsPage() {
         Index rows use traded trackers, such as SPY for the S&P 500, because the free market feed
         prices funds rather than the index itself.
       </p>
-      <div className={styles.indices}>
-        {indices.map((index) => {
-          const pressed = index.symbol === selected && group === "index";
-          return (
-            <button
-              aria-pressed={pressed}
-              className={pressed ? styles.indexSelected : styles.index}
-              key={index.symbol}
-              onClick={() => {
-                setGroup("index");
-                setSymbol(index.symbol);
-              }}
-              type="button"
-            >
-              <strong>{index.symbol}</strong>
-              <span>{index.name}</span>
-            </button>
-          );
-        })}
-      </div>
+      <IndexStrip
+        groupIsIndex={group === "index"}
+        indices={catalog.data.instruments.filter((instrument) => instrument.group === "index")}
+        onSelect={(next) => {
+          setGroup("index");
+          setSymbol(next);
+        }}
+        selected={selected}
+      />
       <Card title="Latest quote">
         <QuoteSummary symbol={selected} />
-        <Button
-          disabled={savedSymbols.includes(selected)}
-          onClick={() => {
-            const instrument = catalog.data.instruments.find((item) => item.symbol === selected);
-            addWatchItem({
-              key: selected,
-              symbol: selected,
-              name: instrument?.name ?? selected,
-              kind: "equity",
-            });
-            window.dispatchEvent(
-              new CustomEvent("marketscope.notify", {
-                detail: { message: `Added ${selected} to the watchlist` },
-              }),
-            );
-          }}
-          variant="secondary"
-        >
-          {savedSymbols.includes(selected) ? "On watchlist" : "Add to watchlist"}
-        </Button>
+        <AddToWatchlist name={selectedName} symbol={selected} />
       </Card>
       <Tabs
         label="Instrument groups"
