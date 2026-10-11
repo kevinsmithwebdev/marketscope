@@ -47,7 +47,9 @@ export function providerRuntime(options?: {
 
 export function describeProviderError(error: unknown): string {
   const message = error instanceof Error ? error.message : "Unknown error";
-  return message.replace(/api_?key=[^&\s]+/gi, "api_key=redacted");
+  return message
+    .replace(/api_?key=[^&\s]+/gi, "api_key=redacted")
+    .replace(/api key as [A-Za-z0-9]+/gi, "api key as redacted");
 }
 
 export async function readProviderJson(fetchImpl: typeof fetch, url: URL): Promise<unknown> {

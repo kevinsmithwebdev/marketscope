@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { TtlCache } from "./provider-cache";
+import { describeProviderError, TtlCache } from "./provider-cache";
+
+describe("describeProviderError", () => {
+  it("redacts keys that a provider echoes back", () => {
+    const error = new Error(
+      "request failed apikey=SECRET123 and We have detected your API key as SECRET123 today",
+    );
+    expect(describeProviderError(error)).toBe(
+      "request failed api_key=redacted and We have detected your api key as redacted today",
+    );
+  });
+});
 
 describe("TtlCache", () => {
   it("drops the oldest entry when the cap is reached", () => {
