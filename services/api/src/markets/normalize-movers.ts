@@ -1,17 +1,6 @@
-export type MarketMover = {
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: string;
-};
+import type { MarketMover, MarketMovers } from "@marketscope/types";
 
-export type MarketMovers = {
-  source: "alpha-vantage";
-  updatedAt: string | null;
-  gainers: MarketMover[];
-  losers: MarketMover[];
-};
+export type { MarketMover, MarketMovers };
 
 const MOVER_LIMIT = 5;
 

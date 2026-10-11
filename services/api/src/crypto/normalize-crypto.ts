@@ -1,24 +1,6 @@
-export type CryptoAsset = {
-  id: string;
-  symbol: string;
-  name: string;
-  price: number;
-  marketCap: number;
-  volume: number;
-  changePercent24h: number | null;
-  rank: number | null;
-};
+import type { CryptoAsset, CryptoAssetList, CryptoHistory } from "@marketscope/types";
 
-export type CryptoAssetList = {
-  source: "coingecko";
-  assets: CryptoAsset[];
-};
-
-export type CryptoHistory = {
-  id: string;
-  source: "coingecko";
-  points: { date: string; close: number }[];
-};
+export type { CryptoAsset, CryptoAssetList, CryptoHistory };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

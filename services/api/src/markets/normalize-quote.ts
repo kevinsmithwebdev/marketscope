@@ -1,10 +1,6 @@
-export type InstrumentQuote = {
-  symbol: string;
-  price: number;
-  change: number | null;
-  changePercent: string | null;
-  source: "alpha-vantage";
-};
+import type { InstrumentQuote } from "@marketscope/types";
+
+export type { InstrumentQuote };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

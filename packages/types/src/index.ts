@@ -5,6 +5,9 @@ export {
   ECONOMY_CHART_RANGES,
   MARKET_CHART_RANGES,
   chartRangeOptions,
+  isChartRange,
+  sliceByRange,
+  usesWeeklyHistory,
 } from "./chart-range";
 export type { ChartRange } from "./chart-range";
 export type { CryptoAsset, CryptoAssetList, CryptoHistory } from "./crypto";

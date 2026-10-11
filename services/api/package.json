@@ -3,12 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build:types": "tsc -p ../../packages/types/tsconfig.json",
+    "prestart": "npm run build:types",
     "start": "node scripts/start.js",
     "start:api": "node scripts/start.js --api-only",
+    "prebuild": "npm run build:types",
     "build": "nest build",
+    "pretest": "npm run build:types",
     "test": "vitest run"
   },
   "dependencies": {
+    "@marketscope/types": "file:../../packages/types",
     "@nestjs/common": "^11.1.6",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.6",

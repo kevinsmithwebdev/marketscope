@@ -1,13 +1,6 @@
-export type PricePoint = {
-  date: string;
-  close: number;
-};
+import type { StockHistory } from "@marketscope/types";
 
-export type StockHistory = {
-  symbol: string;
-  source: "alpha-vantage";
-  points: PricePoint[];
-};
+export type { StockHistory };
 
 const DAILY_SERIES_KEY = "Time Series (Daily)";
 

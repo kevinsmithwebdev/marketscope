@@ -1,13 +1,7 @@
+import type { EconomySeries } from "@marketscope/types";
 import type { EconomySeriesDefinition } from "./series";
 
-export type EconomySeries = {
-  id: EconomySeriesDefinition["id"];
-  title: string;
-  unit: string;
-  source: "fred";
-  seriesId: string;
-  points: { date: string; value: number }[];
-};
+export type { EconomySeries };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

@@ -1,10 +1,8 @@
-export type InstrumentGroup = "index" | "stock" | "etf" | "commodity" | "fx";
+import type { Instrument, InstrumentGroup } from "@marketscope/types";
 
-export type CatalogInstrument = {
-  symbol: string;
-  name: string;
-  group: InstrumentGroup;
-};
+export type { InstrumentGroup };
+
+export type CatalogInstrument = Instrument;
 
 export const MARKET_CATALOG: CatalogInstrument[] = [
   { symbol: "SPY", name: "S&P 500 tracker", group: "index" },

@@ -1,4 +1,6 @@
-export type EconomySeriesId = "inflation" | "unemployment" | "interest-rates" | "gdp";
+import type { EconomySeriesId } from "@marketscope/types";
+
+export type { EconomySeriesId };
 
 export type EconomySeriesDefinition = {
   id: EconomySeriesId;
