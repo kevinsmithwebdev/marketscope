@@ -1,20 +1,19 @@
+import {
+  describeProviderError,
+  providerRuntime,
+  readProviderJson,
+  TtlCache,
+} from "../provider-cache";
 import { type MarketMovers, normalizeMovers } from "./normalize-movers";
 
-const DEFAULT_TTL_MS = 15 * 60 * 1000;
-
-function describeError(error: unknown): string {
-  const message = error instanceof Error ? error.message : "Unknown error";
-  return message.replace(/apikey=[^&\s]+/gi, "apikey=redacted");
-}
+const MOVERS_KEY = "movers";
 
 export class ProviderNotConfiguredError extends Error {}
 export class ProviderRequestError extends Error {}
 
 export class MarketMoversClient {
-  private cached: { expiresAt: number; value: MarketMovers } | undefined;
+  private readonly cache: TtlCache<MarketMovers>;
   private readonly fetchImpl: typeof fetch;
-  private readonly now: () => number;
-  private readonly ttlMs: number;
 
   constructor(
     private readonly options: {
@@ -24,14 +23,15 @@ export class MarketMoversClient {
       ttlMs?: number;
     },
   ) {
-    this.fetchImpl = options.fetchImpl ?? fetch;
-    this.now = options.now ?? Date.now;
-    this.ttlMs = options.ttlMs ?? DEFAULT_TTL_MS;
+    const runtime = providerRuntime(options);
+    this.fetchImpl = runtime.fetchImpl;
+    this.cache = new TtlCache(runtime.now, runtime.ttlMs, 1);
   }
 
   async getMovers(): Promise<{ data: MarketMovers; cacheStatus: "HIT" | "MISS" }> {
-    if (this.cached && this.cached.expiresAt > this.now()) {
-      return { data: this.cached.value, cacheStatus: "HIT" };
+    const cached = this.cache.get(MOVERS_KEY);
+    if (cached) {
+      return { data: cached, cacheStatus: "HIT" };
     }
 
     const apiKey = this.options.apiKey?.trim();
@@ -45,31 +45,27 @@ export class MarketMoversClient {
     url.searchParams.set("function", "TOP_GAINERS_LOSERS");
     url.searchParams.set("apikey", apiKey);
 
-    let payload: unknown;
-    try {
-      const response = await this.fetchImpl(url);
-      if (!response.ok) {
-        throw new ProviderRequestError();
-      }
-      payload = await response.json();
-    } catch (error) {
-      console.error(`Alpha Vantage request failed: ${describeError(error)}`);
-      throw new ProviderRequestError();
-    }
-
-    let data: MarketMovers;
-    try {
-      data = normalizeMovers(payload);
-    } catch (error) {
-      console.error(`Alpha Vantage payload rejected: ${describeError(error)}`);
-      throw new ProviderRequestError();
-    }
-
-    this.cached = {
-      expiresAt: this.now() + this.ttlMs,
-      value: data,
-    };
-
+    const payload = await this.read(url);
+    const data = this.normalize(payload);
+    this.cache.set(MOVERS_KEY, data);
     return { data, cacheStatus: "MISS" };
+  }
+
+  private async read(url: URL): Promise<unknown> {
+    try {
+      return await readProviderJson(this.fetchImpl, url);
+    } catch (error) {
+      console.error(`Alpha Vantage request failed: ${describeProviderError(error)}`);
+      throw new ProviderRequestError();
+    }
+  }
+
+  private normalize(payload: unknown): MarketMovers {
+    try {
+      return normalizeMovers(payload);
+    } catch (error) {
+      console.error(`Alpha Vantage payload rejected: ${describeProviderError(error)}`);
+      throw new ProviderRequestError();
+    }
   }
 }

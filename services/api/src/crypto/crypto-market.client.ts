@@ -1,5 +1,11 @@
 import { sliceByRange, type ChartRange } from "../chart-range";
 import {
+  describeProviderError,
+  providerRuntime,
+  readProviderJson,
+  TtlCache,
+} from "../provider-cache";
+import {
   type CryptoAsset,
   type CryptoAssetList,
   type CryptoHistory,
@@ -9,36 +15,32 @@ import {
 } from "./normalize-crypto";
 
 const ID_PATTERN = /^[a-z0-9-]{1,80}$/;
-const DEFAULT_TTL_MS = 15 * 60 * 1000;
 const MARKETS_URL = "https://api.coingecko.com/api/v3/coins/markets";
-
-function describeError(error: unknown): string {
-  const message = error instanceof Error ? error.message : "Unknown error";
-  return message;
-}
+const ASSET_LIST_KEY = "assets";
 
 export class InvalidAssetError extends Error {}
 export class ProviderRequestError extends Error {}
 
-type CacheEntry<T> = { expiresAt: number; value: T };
-
 export class CryptoMarketClient {
-  private assets: CacheEntry<CryptoAssetList> | undefined;
-  private readonly history = new Map<string, CacheEntry<CryptoHistory>>();
-  private readonly details = new Map<string, CacheEntry<CryptoAsset>>();
+  private readonly assets: TtlCache<CryptoAssetList>;
+  private readonly history: TtlCache<CryptoHistory>;
+  private readonly details: TtlCache<CryptoAsset>;
   private readonly fetchImpl: typeof fetch;
   private readonly now: () => number;
-  private readonly ttlMs: number;
 
   constructor(options?: { fetchImpl?: typeof fetch; now?: () => number; ttlMs?: number }) {
-    this.fetchImpl = options?.fetchImpl ?? fetch;
-    this.now = options?.now ?? Date.now;
-    this.ttlMs = options?.ttlMs ?? DEFAULT_TTL_MS;
+    const runtime = providerRuntime(options);
+    this.fetchImpl = runtime.fetchImpl;
+    this.now = runtime.now;
+    this.assets = new TtlCache(runtime.now, runtime.ttlMs);
+    this.history = new TtlCache(runtime.now, runtime.ttlMs);
+    this.details = new TtlCache(runtime.now, runtime.ttlMs);
   }
 
   async getAssets(): Promise<{ data: CryptoAssetList; cacheStatus: "HIT" | "MISS" }> {
-    if (this.assets && this.assets.expiresAt > this.now()) {
-      return { data: this.assets.value, cacheStatus: "HIT" };
+    const cached = this.assets.get(ASSET_LIST_KEY);
+    if (cached) {
+      return { data: cached, cacheStatus: "HIT" };
     }
 
     const url = new URL(MARKETS_URL);
@@ -49,29 +51,22 @@ export class CryptoMarketClient {
     url.searchParams.set("sparkline", "false");
 
     const payload = await this.read(url);
-    let data: CryptoAssetList;
-    try {
-      data = normalizeAssetList(payload);
-    } catch (error) {
-      console.error(`CoinGecko payload rejected: ${describeError(error)}`);
-      throw new ProviderRequestError();
-    }
-
-    this.assets = { expiresAt: this.now() + this.ttlMs, value: data };
+    const data = this.normalize("CoinGecko payload rejected", () => normalizeAssetList(payload));
+    this.assets.set(ASSET_LIST_KEY, data);
     return { data, cacheStatus: "MISS" };
   }
 
   async getAsset(rawId: string): Promise<{ data: CryptoAsset; cacheStatus: "HIT" | "MISS" }> {
     const id = this.parseId(rawId);
     const cached = this.details.get(id);
-    if (cached && cached.expiresAt > this.now()) {
-      return { data: cached.value, cacheStatus: "HIT" };
+    if (cached) {
+      return { data: cached, cacheStatus: "HIT" };
     }
 
     const list = await this.getAssets();
     const known = list.data.assets.find((asset) => asset.id === id);
     if (known) {
-      this.details.set(id, { expiresAt: this.now() + this.ttlMs, value: known });
+      this.details.set(id, known);
       return { data: known, cacheStatus: list.cacheStatus };
     }
 
@@ -84,15 +79,8 @@ export class CryptoMarketClient {
     url.searchParams.set("sparkline", "false");
 
     const payload = await this.read(url);
-    let data: CryptoAsset;
-    try {
-      data = normalizeCoinDetail(payload);
-    } catch (error) {
-      console.error(`CoinGecko payload rejected: ${describeError(error)}`);
-      throw new ProviderRequestError();
-    }
-
-    this.details.set(id, { expiresAt: this.now() + this.ttlMs, value: data });
+    const data = this.normalize("CoinGecko payload rejected", () => normalizeCoinDetail(payload));
+    this.details.set(id, data);
     return { data, cacheStatus: "MISS" };
   }
 
@@ -124,8 +112,8 @@ export class CryptoMarketClient {
   ): Promise<{ data: CryptoHistory; cacheStatus: "HIT" | "MISS" }> {
     const cacheKey = `${id}:${days}`;
     const cached = this.history.get(cacheKey);
-    if (cached && cached.expiresAt > this.now()) {
-      return { data: cached.value, cacheStatus: "HIT" };
+    if (cached) {
+      return { data: cached, cacheStatus: "HIT" };
     }
 
     const url = new URL(`https://api.coingecko.com/api/v3/coins/${id}/market_chart`);
@@ -133,15 +121,10 @@ export class CryptoMarketClient {
     url.searchParams.set("days", days);
 
     const payload = await this.read(url);
-    let data: CryptoHistory;
-    try {
-      data = normalizeHistory(id, payload, resolution);
-    } catch (error) {
-      console.error(`CoinGecko payload rejected: ${describeError(error)}`);
-      throw new ProviderRequestError();
-    }
-
-    this.history.set(cacheKey, { expiresAt: this.now() + this.ttlMs, value: data });
+    const data = this.normalize("CoinGecko payload rejected", () =>
+      normalizeHistory(id, payload, resolution),
+    );
+    this.history.set(cacheKey, data);
     return { data, cacheStatus: "MISS" };
   }
 
@@ -156,18 +139,18 @@ export class CryptoMarketClient {
   private async read(url: URL): Promise<unknown> {
     console.info(`Fetching ${url.pathname} from CoinGecko`);
     try {
-      const response = await this.fetchImpl(url, {
-        headers: { accept: "application/json" },
-      });
-      if (!response.ok) {
-        throw new ProviderRequestError();
-      }
-      return await response.json();
+      return await readProviderJson(this.fetchImpl, url);
     } catch (error) {
-      if (error instanceof ProviderRequestError) {
-        throw error;
-      }
-      console.error(`CoinGecko request failed: ${describeError(error)}`);
+      console.error(`CoinGecko request failed: ${describeProviderError(error)}`);
+      throw new ProviderRequestError();
+    }
+  }
+
+  private normalize<T>(label: string, parse: () => T): T {
+    try {
+      return parse();
+    } catch (error) {
+      console.error(`${label}: ${describeProviderError(error)}`);
       throw new ProviderRequestError();
     }
   }

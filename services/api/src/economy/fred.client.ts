@@ -1,24 +1,20 @@
 import { sliceByRange, type ChartRange } from "../chart-range";
+import {
+  describeProviderError,
+  providerRuntime,
+  readProviderJson,
+  TtlCache,
+} from "../provider-cache";
 import { type EconomySeries, normalizeObservations } from "./normalize-observations";
 import { ECONOMY_SERIES, type EconomySeriesId } from "./series";
-
-const DEFAULT_TTL_MS = 15 * 60 * 1000;
-
-function describeError(error: unknown): string {
-  const message = error instanceof Error ? error.message : "Unknown error";
-  return message.replace(/api_key=[^&\s]+/gi, "api_key=redacted");
-}
 
 export class ProviderNotConfiguredError extends Error {}
 export class ProviderRequestError extends Error {}
 
-type CacheEntry = { expiresAt: number; value: EconomySeries };
-
 export class FredClient {
-  private readonly cache = new Map<EconomySeriesId, CacheEntry>();
+  private readonly cache: TtlCache<EconomySeries>;
   private readonly fetchImpl: typeof fetch;
   private readonly now: () => number;
-  private readonly ttlMs: number;
 
   constructor(
     private readonly options: {
@@ -28,9 +24,10 @@ export class FredClient {
       ttlMs?: number;
     },
   ) {
-    this.fetchImpl = options.fetchImpl ?? fetch;
-    this.now = options.now ?? Date.now;
-    this.ttlMs = options.ttlMs ?? DEFAULT_TTL_MS;
+    const runtime = providerRuntime(options);
+    this.fetchImpl = runtime.fetchImpl;
+    this.now = runtime.now;
+    this.cache = new TtlCache(runtime.now, runtime.ttlMs);
   }
 
   async getSeries(
@@ -51,8 +48,8 @@ export class FredClient {
     id: EconomySeriesId,
   ): Promise<{ data: EconomySeries; cacheStatus: "HIT" | "MISS" }> {
     const cached = this.cache.get(id);
-    if (cached && cached.expiresAt > this.now()) {
-      return { data: cached.value, cacheStatus: "HIT" };
+    if (cached) {
+      return { data: cached, cacheStatus: "HIT" };
     }
 
     const apiKey = this.options.apiKey?.trim();
@@ -71,27 +68,30 @@ export class FredClient {
 
     console.info(`Fetching ${definition.seriesId} from FRED`);
 
-    let payload: unknown;
-    try {
-      const response = await this.fetchImpl(url);
-      if (!response.ok) {
-        throw new ProviderRequestError();
-      }
-      payload = await response.json();
-    } catch (error) {
-      console.error(`FRED request failed: ${describeError(error)}`);
-      throw new ProviderRequestError();
-    }
-
-    let data: EconomySeries;
-    try {
-      data = normalizeObservations(definition, payload);
-    } catch (error) {
-      console.error(`FRED payload rejected: ${describeError(error)}`);
-      throw new ProviderRequestError();
-    }
-
-    this.cache.set(id, { expiresAt: this.now() + this.ttlMs, value: data });
+    const payload = await this.read(url);
+    const data = this.normalize(definition, payload);
+    this.cache.set(id, data);
     return { data, cacheStatus: "MISS" };
+  }
+
+  private async read(url: URL): Promise<unknown> {
+    try {
+      return await readProviderJson(this.fetchImpl, url);
+    } catch (error) {
+      console.error(`FRED request failed: ${describeProviderError(error)}`);
+      throw new ProviderRequestError();
+    }
+  }
+
+  private normalize(
+    definition: (typeof ECONOMY_SERIES)[EconomySeriesId],
+    payload: unknown,
+  ): EconomySeries {
+    try {
+      return normalizeObservations(definition, payload);
+    } catch (error) {
+      console.error(`FRED payload rejected: ${describeProviderError(error)}`);
+      throw new ProviderRequestError();
+    }
   }
 }

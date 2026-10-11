@@ -1,23 +1,21 @@
+import {
+  describeProviderError,
+  providerRuntime,
+  readProviderJson,
+  TtlCache,
+} from "../provider-cache";
 import type { InstrumentGroup } from "./catalog";
 import { type InstrumentQuote, normalizeQuote } from "./normalize-quote";
 
 const SYMBOL_PATTERN = /^[A-Z0-9.]{1,10}$/;
-const DEFAULT_TTL_MS = 15 * 60 * 1000;
-
-function describeError(error: unknown): string {
-  const message = error instanceof Error ? error.message : "Unknown error";
-  return message.replace(/apikey=[^&\s]+/gi, "apikey=redacted");
-}
 
 export class InvalidSymbolError extends Error {}
 export class ProviderNotConfiguredError extends Error {}
 export class ProviderRequestError extends Error {}
 
 export class MarketQuoteClient {
-  private readonly cache = new Map<string, { expiresAt: number; value: InstrumentQuote }>();
+  private readonly cache: TtlCache<InstrumentQuote>;
   private readonly fetchImpl: typeof fetch;
-  private readonly now: () => number;
-  private readonly ttlMs: number;
 
   constructor(
     private readonly options: {
@@ -27,9 +25,9 @@ export class MarketQuoteClient {
       ttlMs?: number;
     },
   ) {
-    this.fetchImpl = options.fetchImpl ?? fetch;
-    this.now = options.now ?? Date.now;
-    this.ttlMs = options.ttlMs ?? DEFAULT_TTL_MS;
+    const runtime = providerRuntime(options);
+    this.fetchImpl = runtime.fetchImpl;
+    this.cache = new TtlCache(runtime.now, runtime.ttlMs);
   }
 
   async getQuote(
@@ -42,8 +40,8 @@ export class MarketQuoteClient {
     }
 
     const cached = this.cache.get(symbol);
-    if (cached && cached.expiresAt > this.now()) {
-      return { data: cached.value, cacheStatus: "HIT" };
+    if (cached) {
+      return { data: cached, cacheStatus: "HIT" };
     }
 
     const apiKey = this.options.apiKey?.trim();
@@ -69,31 +67,27 @@ export class MarketQuoteClient {
     }
     url.searchParams.set("apikey", apiKey);
 
-    let payload: unknown;
-    try {
-      const response = await this.fetchImpl(url);
-      if (!response.ok) {
-        throw new ProviderRequestError();
-      }
-      payload = await response.json();
-    } catch (error) {
-      console.error(`Alpha Vantage request failed: ${describeError(error)}`);
-      throw new ProviderRequestError();
-    }
-
-    let data: InstrumentQuote;
-    try {
-      data = normalizeQuote(symbol, payload, fx);
-    } catch (error) {
-      console.error(`Alpha Vantage payload rejected: ${describeError(error)}`);
-      throw new ProviderRequestError();
-    }
-
-    this.cache.set(symbol, {
-      expiresAt: this.now() + this.ttlMs,
-      value: data,
-    });
-
+    const payload = await this.read(url);
+    const data = this.normalize(symbol, payload, fx);
+    this.cache.set(symbol, data);
     return { data, cacheStatus: "MISS" };
+  }
+
+  private async read(url: URL): Promise<unknown> {
+    try {
+      return await readProviderJson(this.fetchImpl, url);
+    } catch (error) {
+      console.error(`Alpha Vantage request failed: ${describeProviderError(error)}`);
+      throw new ProviderRequestError();
+    }
+  }
+
+  private normalize(symbol: string, payload: unknown, fx: boolean): InstrumentQuote {
+    try {
+      return normalizeQuote(symbol, payload, fx);
+    } catch (error) {
+      console.error(`Alpha Vantage payload rejected: ${describeProviderError(error)}`);
+      throw new ProviderRequestError();
+    }
   }
 }

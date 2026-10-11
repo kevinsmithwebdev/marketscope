@@ -1,4 +1,10 @@
 import { sliceByRange, usesWeeklyHistory, type ChartRange } from "../chart-range";
+import {
+  describeProviderError,
+  providerRuntime,
+  readProviderJson,
+  TtlCache,
+} from "../provider-cache";
 import type { InstrumentGroup } from "./catalog";
 import { normalizeDailySeries, type StockHistory } from "./normalize-daily-series";
 
@@ -11,22 +17,14 @@ function seriesKey(interval: "daily" | "weekly", fx: boolean): string {
   return interval === "weekly" ? "Weekly Time Series" : "Time Series (Daily)";
 }
 
-const DEFAULT_TTL_MS = 15 * 60 * 1000;
-
-function describeError(error: unknown): string {
-  const message = error instanceof Error ? error.message : "Unknown error";
-  return message.replace(/apikey=[^&\s]+/gi, "apikey=redacted");
-}
-
 export class InvalidSymbolError extends Error {}
 export class ProviderNotConfiguredError extends Error {}
 export class ProviderRequestError extends Error {}
 
 export class MarketHistoryClient {
-  private readonly cache = new Map<string, { expiresAt: number; value: StockHistory }>();
+  private readonly cache: TtlCache<StockHistory>;
   private readonly fetchImpl: typeof fetch;
   private readonly now: () => number;
-  private readonly ttlMs: number;
 
   constructor(
     private readonly options: {
@@ -36,9 +34,10 @@ export class MarketHistoryClient {
       ttlMs?: number;
     },
   ) {
-    this.fetchImpl = options.fetchImpl ?? fetch;
-    this.now = options.now ?? Date.now;
-    this.ttlMs = options.ttlMs ?? DEFAULT_TTL_MS;
+    const runtime = providerRuntime(options);
+    this.fetchImpl = runtime.fetchImpl;
+    this.now = runtime.now;
+    this.cache = new TtlCache(runtime.now, runtime.ttlMs);
   }
 
   async getHistory(
@@ -79,8 +78,8 @@ export class MarketHistoryClient {
 
     const cacheKey = `${interval}:${symbol}`;
     const cached = this.cache.get(cacheKey);
-    if (cached && cached.expiresAt > this.now()) {
-      return { data: cached.value, cacheStatus: "HIT" };
+    if (cached) {
+      return { data: cached, cacheStatus: "HIT" };
     }
 
     const apiKey = this.options.apiKey?.trim();
@@ -112,31 +111,27 @@ export class MarketHistoryClient {
     }
     url.searchParams.set("apikey", apiKey);
 
-    let payload: unknown;
-    try {
-      const response = await this.fetchImpl(url);
-      if (!response.ok) {
-        throw new ProviderRequestError();
-      }
-      payload = await response.json();
-    } catch (error) {
-      console.error(`Alpha Vantage request failed: ${describeError(error)}`);
-      throw new ProviderRequestError();
-    }
-
-    let data: StockHistory;
-    try {
-      data = normalizeDailySeries(symbol, payload, seriesKey(interval, fx));
-    } catch (error) {
-      console.error(`Alpha Vantage payload rejected: ${describeError(error)}`);
-      throw new ProviderRequestError();
-    }
-
-    this.cache.set(cacheKey, {
-      expiresAt: this.now() + this.ttlMs,
-      value: data,
-    });
-
+    const payload = await this.read(url);
+    const data = this.normalize(symbol, payload, seriesKey(interval, fx));
+    this.cache.set(cacheKey, data);
     return { data, cacheStatus: "MISS" };
+  }
+
+  private async read(url: URL): Promise<unknown> {
+    try {
+      return await readProviderJson(this.fetchImpl, url);
+    } catch (error) {
+      console.error(`Alpha Vantage request failed: ${describeProviderError(error)}`);
+      throw new ProviderRequestError();
+    }
+  }
+
+  private normalize(symbol: string, payload: unknown, seriesKeyName: string): StockHistory {
+    try {
+      return normalizeDailySeries(symbol, payload, seriesKeyName);
+    } catch (error) {
+      console.error(`Alpha Vantage payload rejected: ${describeProviderError(error)}`);
+      throw new ProviderRequestError();
+    }
   }
 }
