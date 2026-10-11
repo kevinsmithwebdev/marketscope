@@ -13,6 +13,17 @@ type HeaderRequest = {
   header(name: string): string | undefined;
 };
 
+export function simulationEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  const flag = env.MARKETSCOPE_SIMULATION;
+  if (flag === "1" || flag === "true") {
+    return true;
+  }
+  if (flag === "0" || flag === "false") {
+    return false;
+  }
+  return env.NODE_ENV !== "production";
+}
+
 @Injectable()
 export class SimulationInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
