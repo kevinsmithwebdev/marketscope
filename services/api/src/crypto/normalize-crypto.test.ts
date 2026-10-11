@@ -38,4 +38,22 @@ describe("crypto normalization", () => {
       { date: "2024-01-03", close: 11 },
     ]);
   });
+
+  it("keeps intraday timestamps for a one-day chart", () => {
+    const history = normalizeHistory(
+      "bitcoin",
+      {
+        prices: [
+          [Date.parse("2024-01-02T01:00:00.000Z"), 10],
+          [Date.parse("2024-01-02T01:05:00.000Z"), 12],
+        ],
+      },
+      "intraday",
+    );
+
+    expect(history.points).toEqual([
+      { date: "2024-01-02T01:00:00.000Z", close: 10 },
+      { date: "2024-01-02T01:05:00.000Z", close: 12 },
+    ]);
+  });
 });

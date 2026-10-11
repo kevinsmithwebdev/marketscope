@@ -1,12 +1,17 @@
-import type { EconomySeries, EconomySeriesId } from "@marketscope/types";
+import type { ChartRange, EconomySeries, EconomySeriesId } from "@marketscope/types";
 import { simulationHeaders } from "@marketscope/ui";
 
 const API_BASE_URL = "http://localhost:4000";
 
 export const ECONOMY_STALE_TIME_MS = 15 * 60 * 1000;
 
-export async function fetchEconomySeries(id: EconomySeriesId): Promise<EconomySeries> {
-  const series = await readJson<EconomySeries>(`${API_BASE_URL}/api/economy/${id}`);
+export async function fetchEconomySeries(
+  id: EconomySeriesId,
+  range: ChartRange,
+): Promise<EconomySeries> {
+  const series = await readJson<EconomySeries>(
+    `${API_BASE_URL}/api/economy/${id}?range=${encodeURIComponent(range)}`,
+  );
   if (series.source !== "fred" || !Array.isArray(series.points)) {
     throw new Error("Economic data is unavailable");
   }

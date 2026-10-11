@@ -38,7 +38,7 @@ function EconomyPage() {
     <section className={styles.page}>
       <h1>Economy</h1>
       <p className={styles.note}>
-        United States indicators from FRED, covering about the last ten years.
+        United States indicators from FRED. Choose how far back each chart looks.
       </p>
       <Tabs
         label="Economic indicators"

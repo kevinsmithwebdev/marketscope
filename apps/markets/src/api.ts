@@ -1,4 +1,5 @@
 import type {
+  ChartRange,
   InstrumentCatalog,
   InstrumentQuote,
   MarketMovers,
@@ -36,9 +37,9 @@ export async function fetchQuote(symbol: string): Promise<InstrumentQuote> {
   return quote;
 }
 
-export async function fetchStockHistory(symbol: string): Promise<StockHistory> {
+export async function fetchStockHistory(symbol: string, range: ChartRange): Promise<StockHistory> {
   const history = await readJson<StockHistory>(
-    `${API_BASE_URL}/api/markets/stocks/${encodeURIComponent(symbol)}/history`,
+    `${API_BASE_URL}/api/markets/stocks/${encodeURIComponent(symbol)}/history?range=${encodeURIComponent(range)}`,
   );
   if (history.source !== "alpha-vantage" || !Array.isArray(history.points)) {
     throw new Error("Market data is unavailable");

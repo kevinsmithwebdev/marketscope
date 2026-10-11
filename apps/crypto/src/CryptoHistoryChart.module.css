@@ -9,6 +9,10 @@
   margin-top: 0;
 }
 
+.ranges {
+  margin-bottom: 12px;
+}
+
 .chart {
   height: 320px;
   width: 100%;

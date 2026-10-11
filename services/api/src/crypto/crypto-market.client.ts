@@ -1,3 +1,4 @@
+import { sliceByRange, type ChartRange } from "../chart-range";
 import {
   type CryptoAsset,
   type CryptoAssetList,
@@ -95,27 +96,52 @@ export class CryptoMarketClient {
     return { data, cacheStatus: "MISS" };
   }
 
-  async getHistory(rawId: string): Promise<{ data: CryptoHistory; cacheStatus: "HIT" | "MISS" }> {
+  async getHistory(
+    rawId: string,
+    range?: ChartRange,
+  ): Promise<{ data: CryptoHistory; cacheStatus: "HIT" | "MISS" }> {
     const id = this.parseId(rawId);
-    const cached = this.history.get(id);
+    if (range === "1D") {
+      return this.loadHistory(id, "1", "intraday");
+    }
+    if (range === "1W" || range === "1M" || range === "1Y") {
+      const loaded = await this.loadHistory(id, "365", "day");
+      return {
+        data: {
+          ...loaded.data,
+          points: sliceByRange(loaded.data.points, range, new Date(this.now())),
+        },
+        cacheStatus: loaded.cacheStatus,
+      };
+    }
+    return this.loadHistory(id, "30", "day");
+  }
+
+  private async loadHistory(
+    id: string,
+    days: string,
+    resolution: "day" | "intraday",
+  ): Promise<{ data: CryptoHistory; cacheStatus: "HIT" | "MISS" }> {
+    const cacheKey = `${id}:${days}`;
+    const cached = this.history.get(cacheKey);
     if (cached && cached.expiresAt > this.now()) {
       return { data: cached.value, cacheStatus: "HIT" };
     }
 
     const url = new URL(`https://api.coingecko.com/api/v3/coins/${id}/market_chart`);
     url.searchParams.set("vs_currency", "usd");
-    url.searchParams.set("days", "30");
+    url.searchParams.set("days", days);
 
     const payload = await this.read(url);
     let data: CryptoHistory;
     try {
-      data = normalizeHistory(id, payload);
+      data = normalizeHistory(id, payload, resolution);
     } catch (error) {
       console.error(`CoinGecko payload rejected: ${describeError(error)}`);
       throw new ProviderRequestError();
     }
 
-    this.history.set(id, { expiresAt: this.now() + this.ttlMs, value: data });
+    this.history.set(cacheKey, { expiresAt: this.now() + this.ttlMs, value: data });
     return { data, cacheStatus: "MISS" };
   }
 

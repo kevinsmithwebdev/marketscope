@@ -1,5 +1,6 @@
 import { BadGatewayException, Injectable, ServiceUnavailableException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import type { ChartRange } from "../chart-range";
 import { FredClient, ProviderNotConfiguredError } from "./fred.client";
 import type { EconomySeriesId } from "./series";
 
@@ -13,9 +14,9 @@ export class EconomyService {
     });
   }
 
-  async getSeries(id: EconomySeriesId) {
+  async getSeries(id: EconomySeriesId, range?: ChartRange) {
     try {
-      return await this.client.getSeries(id);
+      return await this.client.getSeries(id, range);
     } catch (error) {
       if (error instanceof ProviderNotConfiguredError) {
         throw new ServiceUnavailableException("Economy data provider is not configured");

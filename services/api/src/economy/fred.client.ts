@@ -1,3 +1,4 @@
+import { sliceByRange, type ChartRange } from "../chart-range";
 import { type EconomySeries, normalizeObservations } from "./normalize-observations";
 import { ECONOMY_SERIES, type EconomySeriesId } from "./series";
 
@@ -34,6 +35,20 @@ export class FredClient {
 
   async getSeries(
     id: EconomySeriesId,
+    range?: ChartRange,
+  ): Promise<{ data: EconomySeries; cacheStatus: "HIT" | "MISS" }> {
+    const loaded = await this.loadSeries(id);
+    return {
+      data: {
+        ...loaded.data,
+        points: sliceByRange(loaded.data.points, range ?? "10Y", new Date(this.now())),
+      },
+      cacheStatus: loaded.cacheStatus,
+    };
+  }
+
+  private async loadSeries(
+    id: EconomySeriesId,
   ): Promise<{ data: EconomySeries; cacheStatus: "HIT" | "MISS" }> {
     const cached = this.cache.get(id);
     if (cached && cached.expiresAt > this.now()) {
@@ -46,15 +61,12 @@ export class FredClient {
     }
 
     const definition = ECONOMY_SERIES[id];
-    const start = new Date(this.now());
-    start.setFullYear(start.getFullYear() - 10);
 
     const url = new URL("https://api.stlouisfed.org/fred/series/observations");
     url.searchParams.set("series_id", definition.seriesId);
     url.searchParams.set("api_key", apiKey);
     url.searchParams.set("file_type", "json");
     url.searchParams.set("units", definition.units);
-    url.searchParams.set("observation_start", start.toISOString().slice(0, 10));
     url.searchParams.set("sort_order", "asc");
 
     console.info(`Fetching ${definition.seriesId} from FRED`);

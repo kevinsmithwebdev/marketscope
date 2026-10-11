@@ -1,4 +1,5 @@
-import { Controller, Get, Param, Res } from "@nestjs/common";
+import { Controller, Get, Param, Query, Res } from "@nestjs/common";
+import { MARKET_RANGES, parseChartRange } from "../chart-range";
 import { findInstrument, MARKET_CATALOG } from "./catalog";
 import { MarketHistoryService } from "./market-history.service";
 import { MarketMoversService } from "./market-movers.service";
@@ -41,10 +42,11 @@ export class MarketsController {
   @Get("stocks/:symbol/history")
   async getHistory(
     @Param("symbol") symbol: string,
+    @Query("range") range: string | undefined,
     @Res({ passthrough: true }) response: CacheResponse,
   ) {
-    console.log("getHistory", symbol);
-    const result = await this.history.getDailyHistory(symbol, findInstrument(symbol)?.group);
+    const parsed = parseChartRange(range, MARKET_RANGES);
+    const result = await this.history.getHistory(symbol, findInstrument(symbol)?.group, parsed);
     response.setHeader("X-Cache", result.cacheStatus);
     return result.data;
   }

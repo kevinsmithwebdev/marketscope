@@ -5,6 +5,7 @@ export { DataTable, type DataTableColumn } from "./DataTable";
 export { ErrorState } from "./ErrorState";
 export { Input } from "./Input";
 export { Modal } from "./Modal";
+export { RadioGroup } from "./RadioGroup";
 export { Select } from "./Select";
 export { Skeleton } from "./Skeleton";
 export {

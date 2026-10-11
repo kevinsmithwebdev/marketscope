@@ -1,4 +1,7 @@
+import { chartRangeOptions, MARKET_CHART_RANGES, type ChartRange } from "@marketscope/types";
 import { useQuery } from "@tanstack/react-query";
+import { RadioGroup } from "@marketscope/ui";
+import { useState } from "react";
 import {
   CartesianGrid,
   Line,
@@ -11,30 +14,32 @@ import {
 import { fetchStockHistory, HISTORY_STALE_TIME_MS } from "./api";
 import styles from "./StockHistoryChart.module.css";
 
+const RANGE_OPTIONS = chartRangeOptions(
+  MARKET_CHART_RANGES,
+  "A one-day chart needs intraday prices, which this feed does not include.",
+);
+
+function seriesLabel(range: ChartRange): string {
+  return range === "1W" || range === "1M" ? "daily close" : "weekly close";
+}
+
 export function StockHistoryChart({ symbol }: { symbol: string }) {
+  const [range, setRange] = useState<ChartRange>("1M");
   const history = useQuery({
-    queryKey: ["markets", "stock-history", symbol],
-    queryFn: () => fetchStockHistory(symbol),
+    queryKey: ["markets", "stock-history", symbol, range],
+    queryFn: () => fetchStockHistory(symbol, range),
     staleTime: HISTORY_STALE_TIME_MS,
   });
 
-  if (history.isPending) {
-    return <p>Loading {symbol} history...</p>;
-  }
-
+  let body = <p>Loading {symbol} history...</p>;
   if (history.isError) {
     const message =
       history.error instanceof Error ? history.error.message : "Market data is unavailable.";
-    return <p role="alert">{message}</p>;
-  }
-
-  if (history.data.points.length === 0) {
-    return <p>No prices returned for {symbol}.</p>;
-  }
-
-  return (
-    <section className={styles.section}>
-      <h2 className={styles.title}>{history.data.symbol} daily close</h2>
+    body = <p role="alert">{message}</p>;
+  } else if (history.data && history.data.points.length === 0) {
+    body = <p>No prices returned for {symbol}.</p>;
+  } else if (history.data) {
+    body = (
       <div className={styles.chart}>
         <ResponsiveContainer>
           <LineChart data={history.data.points}>
@@ -46,6 +51,18 @@ export function StockHistoryChart({ symbol }: { symbol: string }) {
           </LineChart>
         </ResponsiveContainer>
       </div>
+    );
+  }
+
+  return (
+    <section className={styles.section}>
+      <h2 className={styles.title}>
+        {symbol} {seriesLabel(range)}
+      </h2>
+      <div className={styles.ranges}>
+        <RadioGroup label="Time range" onChange={setRange} options={RANGE_OPTIONS} value={range} />
+      </div>
+      {body}
       <p>Source: Alpha Vantage.</p>
       <p>
         Demonstration data. Prices may be delayed, cached, or incomplete and are not a basis for

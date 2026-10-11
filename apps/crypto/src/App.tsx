@@ -99,7 +99,7 @@ function CryptoPage() {
   return (
     <section className={styles.page}>
       <h1>Crypto</h1>
-      <p className={styles.note}>Ranked by market cap. Select a row to chart the last 30 days.</p>
+      <p className={styles.note}>Ranked by market cap. Select a row to chart its price.</p>
       <DataTable
         columns={columns}
         getRowKey={(row) => row.id}

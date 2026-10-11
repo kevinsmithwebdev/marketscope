@@ -105,12 +105,16 @@ export function normalizeCoinDetail(payload: unknown): CryptoAsset {
   return asset;
 }
 
-export function normalizeHistory(id: string, payload: unknown): CryptoHistory {
+export function normalizeHistory(
+  id: string,
+  payload: unknown,
+  resolution: "day" | "intraday" = "day",
+): CryptoHistory {
   if (!isRecord(payload) || !Array.isArray(payload.prices)) {
     throw new Error("Crypto provider did not return price history");
   }
 
-  const byDay = new Map<string, number>();
+  const byTime = new Map<string, number>();
   for (const point of payload.prices) {
     if (!Array.isArray(point) || point.length < 2) {
       continue;
@@ -120,10 +124,14 @@ export function normalizeHistory(id: string, payload: unknown): CryptoHistory {
     if (typeof timestamp !== "number" || typeof price !== "number" || !Number.isFinite(price)) {
       continue;
     }
-    byDay.set(new Date(timestamp).toISOString().slice(0, 10), price);
+    const date =
+      resolution === "intraday"
+        ? new Date(timestamp).toISOString()
+        : new Date(timestamp).toISOString().slice(0, 10);
+    byTime.set(date, price);
   }
 
-  const points = [...byDay.entries()]
+  const points = [...byTime.entries()]
     .map(([date, close]) => ({ date, close }))
     .sort((left, right) => left.date.localeCompare(right.date));
 

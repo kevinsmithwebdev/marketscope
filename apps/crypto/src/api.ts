@@ -1,4 +1,4 @@
-import type { CryptoAssetList, CryptoHistory } from "@marketscope/types";
+import type { ChartRange, CryptoAssetList, CryptoHistory } from "@marketscope/types";
 import { simulationHeaders } from "@marketscope/ui";
 
 const API_BASE_URL = "http://localhost:4000";
@@ -13,9 +13,9 @@ export async function fetchAssets(): Promise<CryptoAssetList> {
   return list;
 }
 
-export async function fetchCryptoHistory(id: string): Promise<CryptoHistory> {
+export async function fetchCryptoHistory(id: string, range: ChartRange): Promise<CryptoHistory> {
   const history = await readJson<CryptoHistory>(
-    `${API_BASE_URL}/api/crypto/${encodeURIComponent(id)}/history`,
+    `${API_BASE_URL}/api/crypto/${encodeURIComponent(id)}/history?range=${encodeURIComponent(range)}`,
   );
   if (history.source !== "coingecko" || !Array.isArray(history.points)) {
     throw new Error("Crypto data is unavailable");
