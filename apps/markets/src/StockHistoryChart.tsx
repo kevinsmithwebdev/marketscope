@@ -1,16 +1,7 @@
 import { chartRangeOptions, MARKET_CHART_RANGES, type ChartRange } from "@marketscope/types";
 import { useQuery } from "@tanstack/react-query";
-import { chartTheme, RadioGroup } from "@marketscope/ui";
+import { LineSeriesChart, RadioGroup } from "@marketscope/ui";
 import { useState } from "react";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { fetchStockHistory, HISTORY_STALE_TIME_MS } from "./api";
 import styles from "./StockHistoryChart.module.css";
 
@@ -39,36 +30,7 @@ export function StockHistoryChart({ symbol }: { symbol: string }) {
   } else if (history.data && history.data.points.length === 0) {
     body = <p>No prices returned for {symbol}.</p>;
   } else if (history.data) {
-    body = (
-      <div className={styles.chart}>
-        <ResponsiveContainer>
-          <LineChart data={history.data.points}>
-            <CartesianGrid stroke={chartTheme.grid} />
-            <XAxis dataKey="date" minTickGap={32} stroke={chartTheme.axis} tick={chartTheme.tick} />
-            <YAxis
-              domain={["auto", "auto"]}
-              stroke={chartTheme.axis}
-              tick={chartTheme.tick}
-              width={72}
-            />
-            <Tooltip
-              contentStyle={chartTheme.tooltip.contentStyle}
-              cursor={chartTheme.tooltip.cursor}
-              itemStyle={chartTheme.tooltip.itemStyle}
-              labelStyle={chartTheme.tooltip.labelStyle}
-            />
-            <Line
-              animationDuration={500}
-              type="monotone"
-              dataKey="close"
-              dot={false}
-              stroke={chartTheme.line}
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    );
+    body = <LineSeriesChart data={history.data.points} dataKey="close" height={360} />;
   }
 
   return (

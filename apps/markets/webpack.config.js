@@ -20,6 +20,9 @@ module.exports = {
         __dirname,
         "../../packages/watchlist-client/src/index.ts",
       ),
+      // The shared chart imports recharts. Use this app's copy so es-toolkit
+      // stays inside the build, where its package exports can resolve.
+      recharts: path.resolve(__dirname, "node_modules/recharts"),
     },
   },
   module: {

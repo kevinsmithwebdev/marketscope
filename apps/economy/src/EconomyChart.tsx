@@ -5,17 +5,8 @@ import {
   type EconomySeriesId,
 } from "@marketscope/types";
 import { useQuery } from "@tanstack/react-query";
-import { chartTheme, ErrorState, RadioGroup, Skeleton } from "@marketscope/ui";
+import { ErrorState, LineSeriesChart, RadioGroup, Skeleton } from "@marketscope/ui";
 import { useState } from "react";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { fetchEconomySeries } from "./api";
 import styles from "./EconomyChart.module.css";
 
@@ -43,39 +34,7 @@ export function EconomyChart({ id }: { id: EconomySeriesId }) {
       <>
         <h2 className={styles.title}>{series.data.title}</h2>
         <p className={styles.unit}>{series.data.unit}</p>
-        <div className={styles.chart}>
-          <ResponsiveContainer>
-            <LineChart data={series.data.points}>
-              <CartesianGrid stroke={chartTheme.grid} />
-              <XAxis
-                dataKey="date"
-                minTickGap={32}
-                stroke={chartTheme.axis}
-                tick={chartTheme.tick}
-              />
-              <YAxis
-                domain={["auto", "auto"]}
-                stroke={chartTheme.axis}
-                tick={chartTheme.tick}
-                width={72}
-              />
-              <Tooltip
-                contentStyle={chartTheme.tooltip.contentStyle}
-                cursor={chartTheme.tooltip.cursor}
-                itemStyle={chartTheme.tooltip.itemStyle}
-                labelStyle={chartTheme.tooltip.labelStyle}
-              />
-              <Line
-                animationDuration={500}
-                type="monotone"
-                dataKey="value"
-                dot={false}
-                stroke={chartTheme.line}
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <LineSeriesChart data={series.data.points} dataKey="value" />
         <p>Source: FRED, series {series.data.seriesId}.</p>
       </>
     );

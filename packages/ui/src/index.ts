@@ -5,6 +5,7 @@ export { Card } from "./Card";
 export { DataTable, type DataTableColumn } from "./DataTable";
 export { ErrorState } from "./ErrorState";
 export { Input } from "./Input";
+export { LineSeriesChart } from "./LineSeriesChart";
 export { Modal } from "./Modal";
 export { RadioGroup } from "./RadioGroup";
 export { Select } from "./Select";

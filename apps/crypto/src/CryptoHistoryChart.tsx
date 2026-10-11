@@ -1,16 +1,7 @@
 import { chartRangeOptions, CRYPTO_CHART_RANGES, type ChartRange } from "@marketscope/types";
 import { useQuery } from "@tanstack/react-query";
-import { chartTheme, RadioGroup } from "@marketscope/ui";
+import { LineSeriesChart, RadioGroup } from "@marketscope/ui";
 import { useState } from "react";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { fetchCryptoHistory } from "./api";
 import styles from "./CryptoHistoryChart.module.css";
 
@@ -58,41 +49,13 @@ export function CryptoHistoryChart({ id, name }: { id: string; name: string }) {
     body = <p>No prices returned for {name}.</p>;
   } else if (history.data) {
     body = (
-      <div className={styles.chart}>
-        <ResponsiveContainer>
-          <LineChart data={history.data.points}>
-            <CartesianGrid stroke={chartTheme.grid} />
-            <XAxis
-              dataKey="date"
-              minTickGap={32}
-              stroke={chartTheme.axis}
-              tick={chartTheme.tick}
-              tickFormatter={formatChartDate}
-            />
-            <YAxis
-              domain={["auto", "auto"]}
-              stroke={chartTheme.axis}
-              tick={chartTheme.tick}
-              width={80}
-            />
-            <Tooltip
-              contentStyle={chartTheme.tooltip.contentStyle}
-              cursor={chartTheme.tooltip.cursor}
-              itemStyle={chartTheme.tooltip.itemStyle}
-              labelFormatter={formatChartDate}
-              labelStyle={chartTheme.tooltip.labelStyle}
-            />
-            <Line
-              animationDuration={500}
-              type="monotone"
-              dataKey="close"
-              dot={false}
-              stroke={chartTheme.line}
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <LineSeriesChart
+        data={history.data.points}
+        dataKey="close"
+        labelFormatter={formatChartDate}
+        tickFormatter={formatChartDate}
+        yAxisWidth={80}
+      />
     );
   }
 

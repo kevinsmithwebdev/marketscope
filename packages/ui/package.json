@@ -2,9 +2,13 @@
   "name": "@marketscope/ui",
   "version": "1.0.0",
   "private": true,
+  "sideEffects": ["**/*.css"],
   "peerDependencies": {
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
+  },
+  "dependencies": {
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

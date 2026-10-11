@@ -1,8 +1,3 @@
-.chart {
-  height: 64px;
-  width: 160px;
-}
-
 .status {
   color: var(--ms-muted, #5c6b82);
   margin: 0;

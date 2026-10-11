@@ -20,6 +20,7 @@ module.exports = {
         __dirname,
         "../../packages/watchlist-client/src/index.ts",
       ),
+      recharts: path.resolve(__dirname, "node_modules/recharts"),
     },
   },
   module: {
