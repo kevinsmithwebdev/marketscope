@@ -11,6 +11,7 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "incremental": true,
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true
