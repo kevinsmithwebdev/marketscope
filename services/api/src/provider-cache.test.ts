@@ -3,7 +3,7 @@ import { TtlCache } from "./provider-cache";
 
 describe("TtlCache", () => {
   it("drops the oldest entry when the cap is reached", () => {
-    let now = 0;
+    const now = 0;
     const cache = new TtlCache<string>(() => now, 1000, 2);
     cache.set("a", "one");
     cache.set("b", "two");

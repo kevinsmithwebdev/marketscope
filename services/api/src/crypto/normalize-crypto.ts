@@ -6,6 +6,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function isUnknownArray(value: unknown): value is unknown[] {
+  return Array.isArray(value);
+}
+
 function readNumber(value: unknown): number | undefined {
   return typeof value === "number" && Number.isFinite(value) ? value : undefined;
 }
@@ -92,13 +96,13 @@ export function normalizeHistory(
   payload: unknown,
   resolution: "day" | "intraday" = "day",
 ): CryptoHistory {
-  if (!isRecord(payload) || !Array.isArray(payload.prices)) {
+  if (!isRecord(payload) || !isUnknownArray(payload.prices)) {
     throw new Error("Crypto provider did not return price history");
   }
 
   const byTime = new Map<string, number>();
   for (const point of payload.prices) {
-    if (!Array.isArray(point) || point.length < 2) {
+    if (!isUnknownArray(point) || point.length < 2) {
       continue;
     }
     const timestamp = point[0];

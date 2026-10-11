@@ -13,5 +13,5 @@
       "@marketscope/types": ["../../packages/types/src/index.ts"]
     }
   },
-  "include": ["src", "src/index.tsx"]
+  "include": ["src", "src/index.tsx", "vitest.config.ts"]
 }
