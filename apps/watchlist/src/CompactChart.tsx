@@ -28,7 +28,13 @@ export function CompactChart({ item }: { item: WatchItem }) {
     <div className={styles.chart}>
       <ResponsiveContainer>
         <LineChart data={history.data}>
-          <Line dataKey="close" dot={false} stroke="#1d4ed8" strokeWidth={2} />
+          <Line
+            animationDuration={500}
+            dataKey="close"
+            dot={false}
+            stroke="#1d4ed8"
+            strokeWidth={2}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>

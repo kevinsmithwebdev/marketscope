@@ -47,7 +47,14 @@ export function StockHistoryChart({ symbol }: { symbol: string }) {
             <XAxis dataKey="date" minTickGap={32} />
             <YAxis domain={["auto", "auto"]} width={72} />
             <Tooltip />
-            <Line type="monotone" dataKey="close" dot={false} stroke="#2563eb" strokeWidth={2} />
+            <Line
+              animationDuration={500}
+              type="monotone"
+              dataKey="close"
+              dot={false}
+              stroke="#2563eb"
+              strokeWidth={2}
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>

@@ -65,7 +65,14 @@ export function CryptoHistoryChart({ id, name }: { id: string; name: string }) {
             <XAxis dataKey="date" minTickGap={32} tickFormatter={formatChartDate} />
             <YAxis domain={["auto", "auto"]} width={80} />
             <Tooltip labelFormatter={formatChartDate} />
-            <Line type="monotone" dataKey="close" dot={false} stroke="#1d4ed8" strokeWidth={2} />
+            <Line
+              animationDuration={500}
+              type="monotone"
+              dataKey="close"
+              dot={false}
+              stroke="#1d4ed8"
+              strokeWidth={2}
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
